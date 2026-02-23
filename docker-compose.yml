@@ -1,0 +1,73 @@
+services:
+  consul:
+    image: consul:1.14.5
+    container_name: docmate_consul
+    restart: always
+    ports:
+      - "8500:8500"
+    networks:
+      - docmate_networks
+
+  db:
+    container_name: docmate_postgres
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - docmate_db:/var/lib/postgresql/data:rw
+    environment:
+      - POSTGRES_DB=docmate_db
+      - POSTGRES_USER=docmate_user
+      - POSTGRES_PASSWORD=12345678
+    tty: true
+    networks:
+      - docmate_networks
+
+  redis:
+    image: redis:7-alpine
+    container_name: docmate_redis
+    restart: always
+    ports:
+      - "6390:6379"
+    command: redis-server --requirepass password123
+    volumes:
+      - docmate_cache:/data:rw
+    networks:
+      - docmate_networks
+
+  docmate:
+    container_name: docmate
+    build:
+      context: .
+    ports:
+      - "8081:8080"
+    command: serve  # make `serve` into `seed` or `seed --truncate=true` if anyone want to run the seeder
+    volumes:
+      - ./:/project
+    environment:
+      - CONSUL_URL=http://docmate_consul:8500
+      - CONSUL_PATH=docmate
+    tty: true
+    depends_on:
+      - consul
+      - db
+      - redis
+    networks:
+      - docmate_networks
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+networks:
+  docmate_networks:
+    name: docmate_networks
+    driver: bridge
+
+volumes:
+  docmate_db:
+    name: docmate-db-data
+  docmate_cache:
+    name: docmate-cache-data

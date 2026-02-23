@@ -1,0 +1,45 @@
+{
+  "app": {
+    "name": "docmate",
+    "port": 8080,
+    "appKeyHeader": "app-key",
+    "appKey": "appkey",
+    "idleTimeout": 30,
+    "readTimeout": 30,
+    "writeTimeout": 30,
+    "jwtSecret": "secret"
+  },
+  "db": {
+    "master": {
+      "debug": true,
+      "prepareStmt": true,
+      "host": "127.0.0.1",
+      "port": 3307,
+      "maxIdleConn": 1,
+      "maxLifeTime": 30,
+      "maxOpenConn": 1,
+      "name": "docmate_db",
+      "username": "root",
+      "password": "12345678"
+    },
+    "replica1": {
+      "port": 3306,
+      "host": "db",
+      "name": "docmate",
+      "username": "root",
+      "password": "root",
+      "debug": true
+    }
+  },
+  "cache": {
+    "redis": {
+      "host": "redis",
+      "port": 6379,
+      "username": "",
+      "password": "",
+      "valueExpiredIn": 0,
+      "database": 4,
+      "mandatoryPrefix": "docmate_"
+    }
+  }
+}

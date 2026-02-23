@@ -1,0 +1,16 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go build and test outputs
+*.out
+*.test
+*.idea
+
+# Dependency directories (for Go modules)
+vendor/
+
+# Go module files
+go.sum
