@@ -7,6 +7,7 @@ import (
 	"docmate/response"
 	"docmate/types"
 	"docmate/utils/consts"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -31,51 +32,51 @@ func (controller *UserController) CreateUser(c echo.Context) error {
 
 	var req types.UserReq
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(response.BadRequest(err.Error()))
+		return response.BadRequest(c, err.Error())
 	}
 
 	if err := req.Validate(); err != nil {
-		return c.JSON(response.BadRequest(err.Error()))
+		return response.BadRequest(c, err.Error())
 	}
 
 	resp, err := controller.userSvc.CreateUser(ctx, req)
 	if err != nil {
-		return c.JSON(response.InternalServerError(err.Error()))
+		return response.InternalServerError(c, err.Error())
 	}
 
-	return c.JSON(response.Success("user created successfully", []types.UserResp{resp}))
+	return response.JSON(c, http.StatusCreated, true, "User created successfully", []types.UserResp{resp}, nil)
 }
 
 func (controller *UserController) GetUser(c echo.Context) error {
 	ctx := c.Request().Context()
 	var req types.UserFilter
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(response.BadRequest(err.Error()))
+		return response.BadRequest(c, err.Error())
 	}
 
 	if err := req.Validate(); err != nil {
-		return c.JSON(response.BadRequest(err.Error()))
+		return response.BadRequest(c, err.Error())
 	}
 
 	user, err := controller.userSvc.GetUser(ctx, req.ID)
 	if err != nil {
-		return c.JSON(response.InternalServerError(err.Error()))
+		return response.InternalServerError(c, err.Error())
 	}
 
-	return c.JSON(response.Success("user fetched successfully", user))
+	return response.Success(c, "user fetched successfully", user)
 }
 
 func (controller *UserController) ListUsers(c echo.Context) error {
 	ctx := c.Request().Context()
 	var req types.UserListReq
 	if err := c.Bind(&req); err != nil {
-		return c.JSON(response.BadRequest(err.Error()))
+		return response.BadRequest(c, err.Error())
 	}
 
 	users, err := controller.userSvc.ListUsers(ctx, req)
 	if err != nil {
-		return c.JSON(response.InternalServerError(err.Error()))
+		return response.InternalServerError(c, err.Error())
 	}
 
-	return c.JSON(response.Success("users fetched successfully", users))
+	return response.Success(c, "users fetched successfully", users)
 }

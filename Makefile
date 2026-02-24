@@ -1,7 +1,7 @@
 PROJECT_NAME := docmate
 PKG_LIST := $(shell go list ${PROJECT_NAME}/... | grep -v /vendor/)
 
-.PHONY: all dep build clean test help development
+.PHONY: all dep build clean test lint help development
 
 all: build ## Build the project
 
@@ -24,6 +24,10 @@ development: ## Set up development environment
 
 	# Building docmate
 	@docker-compose up --build ${PROJECT_NAME}
+
+lint: ## Run golangci-lint (v2)
+	@which golangci-lint > /dev/null 2>&1 || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v2.5.0
+	@$(shell go env GOPATH)/bin/golangci-lint run ./...
 
 clean: ## Remove previous build
 	@rm -f $(PROJECT_NAME)

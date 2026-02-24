@@ -33,5 +33,4 @@ func (r *Routes) Init() {
 		user.POST("/register", r.userController.CreateUser)
 		user.GET("/:id", r.userController.GetUser)
 	}
-
 }

@@ -46,7 +46,7 @@ type ServiceConfig struct {
 }
 
 type DbClient struct {
-	Master *DBConfig
+	Db *DBConfig
 }
 
 type CacheClient struct {
@@ -231,9 +231,9 @@ func setDefaultConfig() {
 	}
 
 	c.Db = &DbClient{
-		Master: &DBConfig{
+		Db: &DBConfig{
 			Host:        "127.0.0.1",
-			Name:        "docmate_db",
+			Name:        "docmate",
 			Port:        3307,
 			Username:    "root",
 			Password:    "12345678",
@@ -243,12 +243,6 @@ func setDefaultConfig() {
 			Debug:       true,
 			PrepareStmt: true,
 		},
-	}
-
-	if c.App.ENV == LOCAL {
-		c.Db.Master.Port = 3306
-		c.Db.Master.Username = "root"
-		c.Db.Master.Password = ""
 	}
 
 	c.Cache = &CacheClient{

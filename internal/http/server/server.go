@@ -4,11 +4,12 @@ import (
 	"context"
 	"docmate/config"
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"log/slog"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Server struct {

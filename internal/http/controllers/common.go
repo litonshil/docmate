@@ -12,5 +12,8 @@ func parseUser(c echo.Context) *model.User {
 		user := m.GenerateMetadata(c, nil)
 		return user
 	}
-	return c.Get("user").(*model.User)
+
+	res := c.Get("user").(*model.User)
+
+	return res
 }

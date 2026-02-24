@@ -6,8 +6,9 @@ import (
 	"docmate/internal/model"
 	"docmate/types"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"log/slog"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
@@ -21,7 +22,6 @@ func NewService(userRepo model.UserRepo) *Service {
 }
 
 func (service *Service) CreateUser(ctx context.Context, req types.UserReq) (types.UserResp, error) {
-
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return types.UserResp{}, err
@@ -38,7 +38,7 @@ func (service *Service) CreateUser(ctx context.Context, req types.UserReq) (type
 	}
 	user, err := service.repo.CreateUser(payload)
 	if err != nil {
-		slog.Error("failed to create user", err)
+		slog.Error("failed to create user", err.Error())
 		return types.UserResp{}, err
 	}
 
@@ -50,7 +50,7 @@ func (service *Service) CreateUser(ctx context.Context, req types.UserReq) (type
 func (service *Service) GetUser(ctx context.Context, userID int) (types.UserResp, error) {
 	user, err := service.repo.GetUser(userID)
 	if err != nil {
-		slog.Error("failed to get user", err)
+		slog.Error("failed to get user", err.Error())
 		return types.UserResp{}, fmt.Errorf("failed to get user: %w", err)
 	}
 	resp := mapToUserResponse(user)
@@ -58,7 +58,6 @@ func (service *Service) GetUser(ctx context.Context, userID int) (types.UserResp
 }
 
 func (service *Service) ListUsers(ctx context.Context, req types.UserListReq) (types.PaginatedResponse, error) {
-
 	if req.Page == 0 || req.Limit == 0 {
 		req.Page = consts.Page
 		req.Limit = consts.Limit

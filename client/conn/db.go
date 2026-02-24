@@ -1,10 +1,11 @@
 package conn
 
 import (
-	"docmate/config"
 	"fmt"
 	"log/slog"
 	"time"
+
+	"docmate/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -14,20 +15,23 @@ import (
 var db *gorm.DB
 
 func ConnectDB() {
-	masterConf := config.DB().Master
+	dbConf := config.DB().Db
 
-	slog.Info("connecting to postgres at ", masterConf.Host, ":", masterConf.Port, "...")
+	slog.Info("connecting to postgres",
+		"host", dbConf.Host,
+		"port", dbConf.Port,
+	)
 	logMode := logger.Silent
-	if masterConf.Debug {
+	if dbConf.Debug {
 		logMode = logger.Info
 	}
 
 	masterDSN := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
-		masterConf.Host, masterConf.Username, masterConf.Password, masterConf.Name, masterConf.Port)
+		dbConf.Host, dbConf.Username, dbConf.Password, dbConf.Name, dbConf.Port)
 
-	slog.Info(masterDSN)
+	slog.Info("postgres dsn", "dsn", masterDSN)
 	dB, err := gorm.Open(postgres.Open(masterDSN), &gorm.Config{
-		PrepareStmt: masterConf.PrepareStmt,
+		PrepareStmt: dbConf.PrepareStmt,
 		Logger:      logger.Default.LogMode(logMode),
 	})
 	if err != nil {
@@ -39,14 +43,14 @@ func ConnectDB() {
 		panic(err)
 	}
 
-	if masterConf.MaxIdleConn != 0 {
-		sqlDb.SetMaxIdleConns(masterConf.MaxIdleConn)
+	if dbConf.MaxIdleConn != 0 {
+		sqlDb.SetMaxIdleConns(dbConf.MaxIdleConn)
 	}
-	if masterConf.MaxOpenConn != 0 {
-		sqlDb.SetMaxOpenConns(masterConf.MaxOpenConn)
+	if dbConf.MaxOpenConn != 0 {
+		sqlDb.SetMaxOpenConns(dbConf.MaxOpenConn)
 	}
-	if masterConf.MaxLifeTime != 0 {
-		sqlDb.SetConnMaxLifetime(masterConf.MaxLifeTime * time.Second)
+	if dbConf.MaxLifeTime != 0 {
+		sqlDb.SetConnMaxLifetime(dbConf.MaxLifeTime * time.Second)
 	}
 
 	db = dB

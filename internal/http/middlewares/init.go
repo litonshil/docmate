@@ -4,10 +4,11 @@ import (
 	"docmate/config"
 	"docmate/utils/monitor"
 	"docmate/utils/msgutil"
-	"github.com/labstack/echo/v4"
-	m "github.com/labstack/echo/v4/middleware"
 	"net/http"
 	"strings"
+
+	"github.com/labstack/echo/v4"
+	m "github.com/labstack/echo/v4/middleware"
 )
 
 const (

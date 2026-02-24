@@ -1,8 +1,9 @@
 package types
 
 import (
-	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"time"
+
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
 
 type User struct {

@@ -20,7 +20,7 @@ func (repo *Repository) GetByID(id int) (*model.User, error) {
 
 func (repo *Repository) GetUser(userID int) (model.UserResp, error) {
 	var user model.UserResp
-	if err := repo.client.Model(&model.User{}).Where("id = ?", userID).First(&user).Error; err != nil {
+	if err := repo.dbClient(nil).Model(&model.User{}).Where("id = ?", userID).First(&user).Error; err != nil {
 		return model.UserResp{}, err
 	}
 	return user, nil

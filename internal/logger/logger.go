@@ -11,7 +11,7 @@ var (
 
 func init() {
 	opts := &slog.HandlerOptions{
-		Level: slog.LevelDebug,
+		Level:     slog.LevelDebug,
 		AddSource: true,
 	}
 

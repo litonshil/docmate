@@ -3,15 +3,15 @@ package middlewares
 import (
 	"bytes"
 	"context"
-	"docmate/config"
 	"docmate/internal/model"
 	"docmate/utils"
 	"docmate/utils/consts"
 	"encoding/json"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"io/ioutil"
 	"strconv"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func authorizeUser(config userConfig) echo.MiddlewareFunc {
@@ -28,7 +28,6 @@ func authorizeUser(config userConfig) echo.MiddlewareFunc {
 			headers := c.Request().Header
 
 			id, _ := strconv.Atoi(headers.Get(headerUserID))
-			//isAdmin, _ := strconv.ParseBool(headers.Get(headerAdmin))
 
 			user := &model.User{
 				ID:        id,
@@ -68,10 +67,10 @@ func GenerateMetadata(c echo.Context, user *model.User) *model.User {
 
 	var body interface{}
 	_ = BindBody(c, &body)
-	appKey := c.Request().Header.Get(config.App().AppKeyHeader)
-	if appKey != "" {
-		appKey = "internal call (app key provided)"
-	}
+	//appKey := c.Request().Header.Get(config.App().AppKeyHeader)
+	//if appKey != "" {
+	//	appKey = "internal call (app key provided)"
+	//}
 	serviceName := c.Request().Header.Get(headerServiceName)
 	_ = serviceName
 	// metadata will be passed as slack logger metadata

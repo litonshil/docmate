@@ -2,9 +2,10 @@ package logger
 
 import (
 	"docmate/config"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"log/slog"
 	"os"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	slogmulti "github.com/samber/slog-multi"
 )

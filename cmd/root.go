@@ -24,7 +24,6 @@ func init() {
 func Execute() {
 	// load application configuration
 	if err := config.Load(); err != nil {
-		//log.Error(err)
 		os.Exit(1)
 	}
 

@@ -1,52 +1,50 @@
 package services
 
 import (
-	"docmate/client/logger"
 	"docmate/internal/model"
 	"docmate/utils/consts"
 	"fmt"
+	"log/slog"
 )
 
 func TransactionRollback(
 	txc *model.TXClient,
-	loggeruc logger.LogClient,
 	entity consts.Entity,
 	action consts.Action,
 ) error {
 	if err := txc.Rollback(); err != nil {
-		loggeruc.Error(
+		slog.Error(
 			fmt.Sprintf(
 				"error occurred while transaction rollbacked for %v %v",
 				entity,
 				action,
 			),
-			err,
+			err.Error(),
 		)
 		return err
 	}
 
-	loggeruc.Info("transaction rollbacked successfully ...")
+	slog.Info("transaction rolled back successfully ...")
 	return nil
 }
 
 func TransactionCommit(
 	txc *model.TXClient,
-	loggeruc logger.LogClient,
 	entity consts.Entity,
 	action consts.Action,
 ) error {
 	if err := txc.Commit(); err != nil {
-		loggeruc.Error(
+		slog.Error(
 			fmt.Sprintf(
 				"error occurred while %v %v transaction commit",
 				entity,
 				action,
 			),
-			err,
+			err.Error(),
 		)
 		return err
 	}
 
-	loggeruc.Info("transaction successfully committed...")
+	slog.Info("transaction successfully committed...")
 	return nil
 }
