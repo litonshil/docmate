@@ -128,7 +128,7 @@ func (r AssignRoleRequest) Validate() error {
 	)
 }
 
-// Validate method for AgentReq
+// Validate method for AgentReq.
 func (ur UserReq) Validate() error {
 	return validation.ValidateStruct(&ur,
 		// ID is mandatory

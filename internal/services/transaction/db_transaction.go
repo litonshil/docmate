@@ -28,8 +28,10 @@ func NewDBTransaction(repo model.TXRepo) *DBTransactionService {
 func (svc *DBTransactionService) CreateTransaction(ctx context.Context) (*model.TXClient, error) {
 	txc, err := svc.repo.CreateTransaction(ctx)
 	if err != nil {
-		slog.Error("transaction creation failed", err.Error())
+		slog.Error("transaction creation failed", "error", err.Error())
+
 		return nil, err
 	}
+
 	return txc, nil
 }

@@ -6,6 +6,7 @@ import (
 
 func (repo *Repository) CreateUser(user model.User) (model.User, error) {
 	err := repo.client.Create(&user).Error
+
 	return user, err
 }
 
@@ -15,6 +16,7 @@ func (repo *Repository) GetByID(id int) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &user, nil
 }
 
@@ -23,6 +25,7 @@ func (repo *Repository) GetUser(userID int) (model.UserResp, error) {
 	if err := repo.dbClient(nil).Model(&model.User{}).Where("id = ?", userID).First(&user).Error; err != nil {
 		return model.UserResp{}, err
 	}
+
 	return user, nil
 }
 

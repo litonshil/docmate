@@ -16,13 +16,9 @@ var (
 	}
 )
 
-func init() {
-	RootCmd.AddCommand(serveCmd)
-}
-
-// Execute executes the root command
+// Execute executes the root command.
 func Execute() {
-	// load application configuration
+	RootCmd.AddCommand(serveCmd)
 	if err := config.Load(); err != nil {
 		os.Exit(1)
 	}

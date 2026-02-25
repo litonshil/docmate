@@ -18,6 +18,7 @@ func NewMessage() Msg {
 
 func (m Msg) Set(key string, value interface{}) Msg {
 	m.Data[key] = value
+
 	return m
 }
 

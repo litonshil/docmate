@@ -24,7 +24,7 @@ type Config struct {
 	Queue *QueueClient
 }
 
-// AppConfig application specific config
+// AppConfig application specific config.
 type AppConfig struct {
 	Name         string
 	Port         int
@@ -57,7 +57,7 @@ type QueueClient struct {
 	Asynq *AsynqConfig
 }
 
-// DBConfig database specific config
+// DBConfig database specific config.
 type DBConfig struct {
 	Host        string
 	Port        int
@@ -97,7 +97,7 @@ type AsynqConfig struct {
 	TaskExecTimeUnit string
 }
 
-// Get returns all configurations
+// Get returns all configurations.
 func Get() Config {
 	return c
 }
@@ -118,7 +118,7 @@ func Queue() *QueueClient {
 	return c.Queue
 }
 
-// Load the config
+// Load the config.
 func Load() error {
 	setDefaultConfig()
 
@@ -142,60 +142,69 @@ func Load() error {
 
 	// Log missing configuration variables
 	log.Println("CONFIG_FILE_PATH or CONSUL_URL and CONSUL_PATH are missing from ENV")
+
 	return nil
 }
 
-// bindEnvVariables binds the environment variables to Viper
+// bindEnvVariables binds the environment variables to Viper.
 func bindEnvVariables() error {
 	envVars := []string{"env", "CONSUL_URL", "CONSUL_PATH", "CONFIG_FILE_PATH"}
 	for _, v := range envVars {
 		if err := viper.BindEnv(v); err != nil {
 			log.Printf("Error binding env variable %s: %v", v, err)
+
 			return err
 		}
 	}
+
 	return nil
 }
 
-// loadConfigFromFile loads config from a local file
+// loadConfigFromFile loads config from a local file.
 func loadConfigFromFile(configFilePath string) error {
 	viper.SetConfigFile(configFilePath)
 	if err := viper.ReadInConfig(); err != nil {
 		log.Printf("Failed to read config from file: %v", err)
+
 		return err
 	}
 
 	log.Printf("Loaded configuration from %s", configFilePath)
+
 	return unmarshalConfig()
 }
 
-// loadConfigFromConsul loads config from Consul
+// loadConfigFromConsul loads config from Consul.
 func loadConfigFromConsul(consulURL, consulPath string) error {
 	viper.SetConfigType("json")
 
 	if err := viper.AddRemoteProvider("consul", consulURL, consulPath); err != nil {
 		log.Printf("Failed to add remote provider: %v", err)
+
 		return err
 	}
 
 	if err := viper.ReadRemoteConfig(); err != nil {
 		log.Printf("Failed to read remote config from Consul: %v", err)
+
 		return err
 	}
 
 	log.Printf("Loaded configuration from Consul URL: %v, Path: %v", consulURL, consulPath)
+
 	return unmarshalConfig()
 }
 
-// unmarshalConfig unmarshal the configuration into the Config struct
+// unmarshalConfig unmarshal the configuration into the Config struct.
 func unmarshalConfig() error {
 	c = Config{}
 	if err := viper.Unmarshal(&c); err != nil {
 		log.Printf("Unable to decode config: %v", err)
+
 		return err
 	}
 
-	// Optionally, print the configuration for verification
+	// Optionally, print the configuration for verification.
 	if r, err := json.MarshalIndent(&c, "", "  "); err == nil {
 		fmt.Println(string(r))
 	}
@@ -203,19 +212,21 @@ func unmarshalConfig() error {
 	return nil
 }
 
-// ReadDotENV reads the environment from the .env file
+// ReadDotENV reads the environment from the .env file.
 func ReadDotENV() string {
 	viper.SetConfigFile(".env")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Printf("Error reading .env file: %v", err)
+
 		return ""
 	}
 
 	env := viper.GetString("ENV")
+
 	return env
 }
 
-// setDefaultConfig sets the default configurations
+// setDefaultConfig sets the default configurations.
 func setDefaultConfig() {
 	env := ReadDotENV()
 

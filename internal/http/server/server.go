@@ -30,7 +30,7 @@ func New() *Server {
 	return &Server{Echo: echo.New()}
 }
 
-// GracefulShutdown server will gracefully shut down within 5 sec
+// GracefulShutdown server will gracefully shut down within 5 sec.
 func GracefulShutdown(e *echo.Echo) {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt)

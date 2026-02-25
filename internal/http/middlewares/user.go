@@ -43,7 +43,7 @@ func authorizeUser(config userConfig) echo.MiddlewareFunc {
 	}
 }
 
-// BindBody binds request body contents to bindable object
+// BindBody binds request body contents to bindable object.
 func BindBody(c echo.Context, i interface{}) error {
 	// read origin body bytes
 	var bodyBytes []byte
@@ -57,6 +57,7 @@ func BindBody(c echo.Context, i interface{}) error {
 			return err
 		}
 	}
+
 	return nil
 }
 

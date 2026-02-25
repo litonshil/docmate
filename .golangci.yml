@@ -1,109 +1,131 @@
 version: "2"
 
-run:
-  go: "1.25"
-  timeout: 5m
-  allow-parallel-runners: true
-
 linters:
-  default: none
-  enable:
-    # Bugs & correctness
-    - errcheck        # Check for unchecked errors
-#    - govet           # Suspicious constructs (go vet)
-    - ineffassign     # Detect ineffectual assignments
-#    - staticcheck     # Static analysis checks
-    - unused          # Unused code
+    default: "none"  # similar to disable-all: true in v1
 
-    # Style & best practices
-#    - revive          # Replacement for golint
-    - misspell        # Spelling mistakes in comments/strings
-    - whitespace      # Unnecessary blank lines
+    enable:
+      - asasalint
+      - asciicheck
+      - bidichk
+      - bodyclose
+      - canonicalheader
+#     - containedctx
+      - contextcheck
+      - copyloopvar
+      - decorder
+      - depguard
+      - dogsled
+      - dupword
+      - errname
+      - errorlint
+      - fatcontext
+      - ginkgolinter
+      - gocheckcompilerdirectives
+      - gochecknoinits
+      - gochecksumtype
+      - goconst
+      - gocyclo
+      - godot
+      - goheader
+      - gomoddirectives
+      - goprintffuncname
+      - grouper
+      - importas
+      - inamedparam
+      - ineffassign
+      - intrange
+      - loggercheck
+      - maintidx
+      - makezero
+      - mirror
+      - misspell
+      - nakedret
+      - nilerr
+      - nlreturn
+      - nolintlint
+      - nosprintfhostport
+      - paralleltest
+      - predeclared
+      - promlinter
+      - protogetter
+      - reassign
+      - rowserrcheck
+      - sloglint
+      - spancheck
+      - sqlclosecheck
+      - testableexamples
+      - testifylint
+      - testpackage
+      - thelper
+      - tparallel
+      - unconvert
+      - unparam
+      - unused
+      - whitespace
+      - zerologlint
 
-    # Complexity & maintainability
-    - cyclop          # Cyclomatic complexity
-    - gocognit        # Cognitive complexity
-    - funlen          # Function length
-    - maintidx        # Maintainability index
+    settings:
+      errcheck:
+        check-type-assertions: true
 
-    # Security
-    - gosec           # Security issues
+      goconst:
+        min-len: 2
+        min-occurrences: 3
 
-    # Performance
-    - prealloc        # Slice preallocation suggestions
-    - bodyclose       # HTTP response body closure
+      gocritic:
+        enabled-tags:
+          - diagnostic
+          - experimental
+          - opinionated
+          - performance
+          - style
 
-    # Error handling
-#    - wrapcheck       # Errors wrapped before returning
-    - errorlint       # Error wrapping issues
+      govet:
+        enable:
+          - fieldalignment
 
-    # Code cleanliness
-#    - godot           # Comments end in a period
-    - nolintlint      # Malformed nolint directives
-    - unconvert       # Unnecessary type conversions
-    - unparam         # Unused function parameters
-    - dupl            # Code duplication
-#    - gocritic        # Various code checks
+      nolintlint:
+        require-explanation: true
+        require-specific: true
 
-linters-settings:
-  cyclop:
-    max-complexity: 15
+      depguard:
+        rules:
+          main:
+            list-mode: lax
+            files:
+              - "!**/*_a _file.go"
+            allow:
+              - $gostd
+              - github.com/OpenPeeDeeP
+            deny:
+              - pkg: "github.com/sirupsen/logrus"
+                desc: not allowed
+              - pkg: "github.com/pkg/errors"
+                desc: Should be replaced by standard lib errors package
 
-  gocognit:
-    min-complexity: 20
+formatters:
+    enable:
+      - gofmt
+      - goimports
 
-  funlen:
-    lines: 80
-    statements: 50
+output:
+    format:
+      colored-line-number:
+        print-issued-lines: true
+        print-linter-name: true
+    uniq-by-line: false
+    path-prefix: ""
+    sort-results: true
+    sort-order:
+      - linter
+      - severity
+      - file
+    show-stats: true
 
-  gosec:
-    excludes:
-      - G104  # Unhandled errors in defer (handled by errcheck)
-
-  revive:
-    rules:
-      - name: exported
-      - name: unused-parameter
-      - name: var-naming
-
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-      - performance
-
-  wrapcheck:
-    ignoreSigs:
-      - .Errorf(
-      - errors.New(
-      - errors.Unwrap(
-      - .Wrap(
-      - .Wrapf(
-
-  dupl:
-    threshold: 150
-
-  misspell:
-    locale: US
-
-issues:
-  max-same-issues: 5
-  max-issues-per-linter: 50
-
-  exclude-rules:
-    # Relax some rules in test files
-    - path: _test\.go
-      linters:
-        - funlen
-        - dupl
-        - gosec
-        - wrapcheck
-        - gocognit
-
-    # Relax complexity in main entrypoints
-    - path: cmd/
-      linters:
-        - cyclop
-        - funlen
-
-  fix: false
+run:
+    concurrency: 4
+    timeout: 5m
+    issues-exit-code: 1
+    allow-parallel-runners: true
+    allow-serial-runners: true
+    go: "1.25"

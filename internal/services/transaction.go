@@ -19,12 +19,15 @@ func TransactionRollback(
 				entity,
 				action,
 			),
+			"",
 			err.Error(),
 		)
+
 		return err
 	}
 
 	slog.Info("transaction rolled back successfully ...")
+
 	return nil
 }
 
@@ -40,11 +43,14 @@ func TransactionCommit(
 				entity,
 				action,
 			),
-			err.Error(),
+			"error",
+			err,
 		)
+
 		return err
 	}
 
 	slog.Info("transaction successfully committed...")
+
 	return nil
 }

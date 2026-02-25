@@ -51,6 +51,7 @@ func Init(e *echo.Echo) {
 					return true
 				}
 			}
+
 			return false
 		},
 	}))
@@ -65,6 +66,7 @@ func CheckAppKey() echo.MiddlewareFunc {
 			if appKey != config.Get().App.AppKey {
 				return c.JSON(http.StatusForbidden, msgutil.ForbiddenResponseMsg())
 			}
+
 			return next(c)
 		}
 	}

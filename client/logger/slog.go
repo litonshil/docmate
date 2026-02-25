@@ -10,10 +10,10 @@ import (
 	slogmulti "github.com/samber/slog-multi"
 )
 
-// logger is the default logger used by the application
+// logger is the default logger used by the application.
 var logger *slog.Logger
 
-// Set sets the logger configuration based on the environment
+// Set sets the logger configuration based on the environment.
 func Set(config config.AppConfig) {
 	logger = slog.New(
 		slog.NewJSONHandler(os.Stderr, nil),

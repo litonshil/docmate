@@ -25,6 +25,7 @@ func (repo *Repository) CreateTransaction(ctx context.Context) (*model.TXClient,
 		return nil, tx.Error
 	}
 	slog.Info("transaction started...")
+
 	return transaction.NewTXClient(ctx, tx), nil
 }
 

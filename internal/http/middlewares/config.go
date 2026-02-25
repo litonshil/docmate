@@ -9,10 +9,10 @@ type userConfig struct {
 }
 
 const (
-	headerUserID        = "user-id"
-	headerAdmin         = "admin"
-	headerUserFirstName = "user-firstname"
-	headerUserLastName  = "user-lastname"
-	headerUserEmail     = "user-email"
-	headerServiceName   = "service-name"
+	headerUserID        = "User-Id"
+	headerAdmin         = "Admin"
+	headerUserFirstName = "User-Firstname"
+	headerUserLastName  = "User-Lastname"
+	headerUserEmail     = "User-Email"
+	headerServiceName   = "Service-Name"
 )

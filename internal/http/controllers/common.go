@@ -10,6 +10,7 @@ import (
 func parseUser(c echo.Context) *model.User {
 	if c.Get("user") == nil {
 		user := m.GenerateMetadata(c, nil)
+
 		return user
 	}
 

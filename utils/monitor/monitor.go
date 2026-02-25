@@ -9,7 +9,7 @@ const (
 	promSubsystemName = "cleanarch"
 )
 
-// NewEchoPrometheusClient adds metricsPath to echo server as middleware
+// NewEchoPrometheusClient adds metricsPath to echo server as middleware.
 func NewEchoPrometheusClient(e *echo.Echo, metricsPath *string) {
 	prom := echoprometheus.NewMiddleware(promSubsystemName)
 

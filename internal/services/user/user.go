@@ -38,22 +38,26 @@ func (service *Service) CreateUser(ctx context.Context, req types.UserReq) (type
 	}
 	user, err := service.repo.CreateUser(payload)
 	if err != nil {
-		slog.Error("failed to create user", err.Error())
+		slog.Error("failed to create user", "error", err.Error())
+
 		return types.UserResp{}, err
 	}
 
 	resp := types.UserResp{
 		ID: user.ID,
 	}
+
 	return resp, nil
 }
 func (service *Service) GetUser(ctx context.Context, userID int) (types.UserResp, error) {
 	user, err := service.repo.GetUser(userID)
 	if err != nil {
-		slog.Error("failed to get user", err.Error())
+		slog.Error("failed to get user", "error", err.Error())
+
 		return types.UserResp{}, fmt.Errorf("failed to get user: %w", err)
 	}
 	resp := mapToUserResponse(user)
+
 	return resp, nil
 }
 
@@ -67,7 +71,8 @@ func (service *Service) ListUsers(ctx context.Context, req types.UserListReq) (t
 
 	users, total, err := service.repo.ListUsers(offset, req.Limit)
 	if err != nil {
-		slog.Error("failed to list users", err)
+		slog.Error("failed to list users", "error", err)
+
 		return types.PaginatedResponse{}, fmt.Errorf("failed to list users: %w", err)
 	}
 
@@ -104,5 +109,6 @@ func mapToUserResponse(user model.UserResp) types.UserResp {
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
+
 	return resp
 }
