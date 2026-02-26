@@ -1,3 +1,4 @@
-FROM mysql:8.0.31
-#Initial database load
+FROM postgres:15-alpine
+
+# Initial database load
 COPY ./scripts/initdb.sql /docker-entrypoint-initdb.d/

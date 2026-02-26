@@ -9,21 +9,29 @@ import (
 	"docmate/internal/repositories/db"
 	txservice "docmate/internal/services/transaction"
 	userservice "docmate/internal/services/user"
+	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 )
 
 var serveCmd = &cobra.Command{
-	Use: "serve",
-	Run: serve,
+	Use:   "serve",
+	Short: "Start the Docmate HTTP server",
+	Run: func(cmd *cobra.Command, args []string) {
+		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+		defer stop()
+
+		HttpServer := httpServer.New()
+		MountRoutes(ctx, HttpServer.Echo)
+		HttpServer.Start()
+	},
 }
 
-func serve(cmd *cobra.Command, args []string) {
-	// base context
-	baseContext := context.Background()
-
+func MountRoutes(ctx context.Context, e *echo.Echo) {
 	dbClient := conn.Db()
-
 	dbRepo := db.NewRepository(dbClient)
 
 	txsvc := txservice.NewDBTransaction(dbRepo)
@@ -31,20 +39,12 @@ func serve(cmd *cobra.Command, args []string) {
 
 	_ = txsvc
 
-	// HttpServer
-	var HttpServer = httpServer.New()
+	userController := controllers.NewUserController(ctx, usersvc)
 
-	userController := controllers.NewUserController(
-		baseContext,
-		usersvc,
-	)
+	routes := httpRoutes.New(e, userController)
+	routes.Init()
+}
 
-	var Routes = httpRoutes.New(
-		HttpServer.Echo,
-		userController,
-	)
-
-	// Spooling
-	Routes.Init()
-	HttpServer.Start()
+func RegisterServeCommand() {
+	RegisterSubCommand(serveCmd)
 }

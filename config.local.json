@@ -10,25 +10,17 @@
     "jwtSecret": "secret"
   },
   "db": {
-    "master": {
+    "db": {
       "debug": true,
       "prepareStmt": true,
-      "host": "127.0.0.1",
-      "port": 3307,
+      "host": "db",
+      "port": 5432,
       "maxIdleConn": 1,
       "maxLifeTime": 30,
       "maxOpenConn": 1,
-      "name": "docmate_db",
-      "username": "root",
-      "password": "12345678"
-    },
-    "replica1": {
-      "port": 3306,
-      "host": "db",
       "name": "docmate",
-      "username": "root",
-      "password": "root",
-      "debug": true
+      "username": "docmate_user",
+      "password": "12345678"
     }
   },
   "cache": {
@@ -36,7 +28,7 @@
       "host": "redis",
       "port": 6379,
       "username": "",
-      "password": "",
+      "password": "password123",
       "valueExpiredIn": 0,
       "database": 4,
       "mandatoryPrefix": "docmate_"
