@@ -1,3 +1,16 @@
+### Dev & Tooling
+- [golangci-lint](https://github.com/golangci/golangci-lint): Linter aggregator
+- [Docker](https://www.docker.com/), [docker-compose](https://docs.docker.com/compose/): Containerization
+
+### Enable git pre-commit hook
+
+- Run the following command. we are using golangci-lint as a linter.
+
+```Shell
+make pre-commit-hook 
+```
+
+- Perfect! now for each commit, golangci-lint will check for any issue.
 
 ## Database Migrations
 
