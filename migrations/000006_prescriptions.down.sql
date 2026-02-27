@@ -1,0 +1,10 @@
+DROP INDEX IF EXISTS idx_prescriptions_deleted_at;
+DROP INDEX IF EXISTS idx_prescriptions_investigations;
+DROP INDEX IF EXISTS idx_prescriptions_medications;
+DROP INDEX IF EXISTS idx_prescriptions_diagnosis;
+DROP INDEX IF EXISTS idx_prescriptions_chief_complaints;
+DROP INDEX IF EXISTS idx_prescriptions_follow_up_date;
+DROP INDEX IF EXISTS idx_prescriptions_chamber_id;
+DROP INDEX IF EXISTS idx_prescriptions_patient_id;
+DROP INDEX IF EXISTS idx_prescriptions_doctor_id;
+DROP TABLE IF EXISTS prescriptions;

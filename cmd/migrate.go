@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"path/filepath"
 
@@ -48,10 +49,9 @@ func runMigration(direction string) error {
 		return fmt.Errorf("DB config not loaded")
 	}
 
-	fmt.Printf("DSN: postgres://%s:****@%s:%d/%s\n", dbCfg.Username, dbCfg.Host, dbCfg.Port, dbCfg.Name)
-	// Build PostgreSQL DSN
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
-		dbCfg.Username, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.Name)
+	hostPort := net.JoinHostPort(dbCfg.Host, fmt.Sprintf("%d", dbCfg.Port))
+	dsn := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable",
+		dbCfg.Username, dbCfg.Password, hostPort, dbCfg.Name)
 
 	// Dynamically determine migrations directory
 	var migrationsDir string
@@ -65,6 +65,7 @@ func runMigration(direction string) error {
 			migrationsDir = "file://" + dir
 			found = true
 			fmt.Printf("Migrations directory: %s\n", migrationsDir)
+
 			break
 		}
 	}

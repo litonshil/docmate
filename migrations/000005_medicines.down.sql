@@ -1,0 +1,9 @@
+DROP INDEX IF EXISTS idx_medicines_generic_name_trgm;
+DROP INDEX IF EXISTS idx_medicines_brand_name_trgm;
+DROP INDEX IF EXISTS idx_medicines_deleted_at;
+DROP INDEX IF EXISTS idx_medicines_form;
+DROP INDEX IF EXISTS idx_medicines_generic_name;
+DROP INDEX IF EXISTS idx_medicines_brand_name;
+DROP INDEX IF EXISTS idx_medicines_created_by;
+DROP TABLE IF EXISTS medicines;
+DROP TYPE IF EXISTS medicine_form_type;

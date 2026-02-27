@@ -1,0 +1,30 @@
+#!/bin/bash
+
+printf "\n---------------Running git pre-commit hook---------------\n"
+
+## this will retrieve all of the .go files that have been
+## changed since the last commit
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '.go$')
+
+## we can check to see if this is empty
+if [[ $STAGED_GO_FILES == "" ]]; then
+    printf "No Go Files to Update!\n"
+else
+    for FILE in $STAGED_GO_FILES; do
+        go fmt "$FILE"
+        "$(go env GOPATH)"/bin/goimports -w "$FILE"
+    done
+
+    "$(go env GOPATH)"/bin/golangci-lint run
+    if [[ $? != 0 ]]; then
+        printf "\nCommit failed! Please fix errors before committing.\n"
+        exit 1
+    fi
+
+    for FILE in $STAGED_GO_FILES; do
+        git add "$FILE"
+    done
+fi
+
+
+printf "\n---------------Git pre-commit hook end---------------\n"
