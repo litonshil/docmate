@@ -18,7 +18,7 @@ CREATE TYPE medicine_form_type AS ENUM (
 
 CREATE TABLE IF NOT EXISTS medicines (
     id                  SERIAL PRIMARY KEY,
-    created_by          INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    created_by          INT NOT NULL REFERENCES users(id),
 
     -- Medicine Info
     brand_name          VARCHAR(255)            NOT NULL,
