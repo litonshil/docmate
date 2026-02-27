@@ -16,7 +16,7 @@ services:
     volumes:
       - docmate_db:/var/lib/postgresql/data:rw
     environment:
-      - POSTGRES_DB=docmate_db
+      - POSTGRES_DB=docmate
       - POSTGRES_USER=docmate_user
       - POSTGRES_PASSWORD=12345678
     tty: true

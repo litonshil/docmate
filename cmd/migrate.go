@@ -42,12 +42,13 @@ func RegisterMigrateCommand() {
 }
 
 func runMigration(direction string) error {
-	config.Load()
+	//config.Load()
 	dbCfg := config.DB().Db
 	if dbCfg == nil {
 		return fmt.Errorf("DB config not loaded")
 	}
 
+	fmt.Printf("DSN: postgres://%s:****@%s:%d/%s\n", dbCfg.Username, dbCfg.Host, dbCfg.Port, dbCfg.Name)
 	// Build PostgreSQL DSN
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		dbCfg.Username, dbCfg.Password, dbCfg.Host, dbCfg.Port, dbCfg.Name)

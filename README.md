@@ -13,10 +13,10 @@ You can run migrations using the Cobra CLI (from the built binary):
 
 ```sh
 # Migrate up (apply all new migrations)
-./doc-mate migrate up
+./app migrate up
 
 # Migrate down (revert all migrations)
-./doc-mate migrate down
+./app migrate down
 ```
 
 - **DB credentials/config** are loaded from Consul at runtime.
