@@ -1,4 +1,8 @@
--- 000004_create_patients_table.up.sql
+CREATE TYPE gender_type AS ENUM (
+    'male',
+    'female',
+    'other'
+);
 
 CREATE TYPE blood_group_type AS ENUM (
     'A+',
@@ -39,5 +43,4 @@ CREATE INDEX idx_patients_doctor_id         ON patients (doctor_id);
 CREATE INDEX idx_patients_full_name         ON patients (full_name);
 CREATE INDEX idx_patients_phone             ON patients (phone);
 CREATE INDEX idx_patients_blood_group       ON patients (blood_group);
-CREATE INDEX idx_patients_deleted_at        ON patients (deleted_at)
-    WHERE deleted_at
+CREATE INDEX idx_patients_deleted_at        ON patients (deleted_at);

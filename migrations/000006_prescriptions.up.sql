@@ -66,5 +66,4 @@ CREATE INDEX idx_prescriptions_chief_complaints ON prescriptions USING GIN (chie
 CREATE INDEX idx_prescriptions_diagnosis        ON prescriptions USING GIN (diagnosis);
 CREATE INDEX idx_prescriptions_medications      ON prescriptions USING GIN (medications);
 CREATE INDEX idx_prescriptions_investigations   ON prescriptions USING GIN (investigations);
-CREATE INDEX idx_prescriptions_deleted_at       ON prescriptions (deleted_at)
-    WHERE deleted_at IS NULL;
+CREATE INDEX idx_prescriptions_deleted_at       ON prescriptions (deleted_at);

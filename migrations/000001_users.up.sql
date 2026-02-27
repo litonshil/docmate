@@ -4,8 +4,8 @@ CREATE TYPE user_role AS ENUM (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-                                     id          SERIAL PRIMARY KEY,
-                                     username    VARCHAR(255)        NOT NULL UNIQUE,
+    id          SERIAL PRIMARY KEY,
+    username    VARCHAR(255)        NOT NULL UNIQUE,
     email       VARCHAR(255)        NOT NULL UNIQUE,
     password    VARCHAR(255)        NOT NULL,
     role        user_role           NOT NULL DEFAULT 'doctor',
@@ -23,5 +23,4 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX idx_users_role         ON users (role);
 
 -- Soft delete filtering
-CREATE INDEX idx_users_deleted_at   ON users (deleted_at)
-    WHERE deleted_at IS NULL;
+CREATE INDEX idx_users_deleted_at   ON users (deleted_at);

@@ -47,5 +47,4 @@ CREATE INDEX idx_chambers_doctor_id      ON chambers (doctor_id);
 CREATE INDEX idx_chambers_city           ON chambers (city);
 CREATE INDEX idx_chambers_area           ON chambers (area);
 CREATE INDEX idx_chambers_visiting_hours ON chambers USING GIN (visiting_hours);
-CREATE INDEX idx_chambers_deleted_at     ON chambers (deleted_at)
-    WHERE deleted_at IS NULL;
+CREATE INDEX idx_chambers_deleted_at     ON chambers (deleted_at);

@@ -40,8 +40,7 @@ CREATE INDEX idx_medicines_created_by           ON medicines (created_by);
 CREATE INDEX idx_medicines_brand_name           ON medicines (brand_name);
 CREATE INDEX idx_medicines_generic_name         ON medicines (generic_name);
 CREATE INDEX idx_medicines_form                 ON medicines (form);
-CREATE INDEX idx_medicines_deleted_at           ON medicines (deleted_at)
-    WHERE deleted_at IS NULL;
+CREATE INDEX idx_medicines_deleted_at           ON medicines (deleted_at);
 
 -- Fuzzy search on brand and generic name
 CREATE EXTENSION IF NOT EXISTS pg_trgm;

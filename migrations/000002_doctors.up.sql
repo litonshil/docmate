@@ -12,12 +12,6 @@ CREATE TYPE degree_type AS ENUM (
     'other'
 );
 
-CREATE TYPE gender_type AS ENUM (
-    'male',
-    'female',
-    'other'
-);
-
 CREATE TYPE specialization_type AS ENUM (
     -- Medicine
     'General Practice',
@@ -87,5 +81,4 @@ CREATE TABLE doctors (
 CREATE INDEX idx_doctors_specialization ON doctors USING GIN (specialization);
 CREATE INDEX idx_doctors_full_name      ON doctors (full_name);
 CREATE INDEX idx_doctors_phone          ON doctors (phone);
-CREATE INDEX idx_doctors_deleted_at     ON doctors (deleted_at)
-    WHERE deleted_at IS NULL;
+CREATE INDEX idx_doctors_deleted_at     ON doctors (deleted_at);
