@@ -65,7 +65,6 @@ func runMigration(direction string) error {
 			migrationsDir = "file://" + dir
 			found = true
 			fmt.Printf("Migrations directory: %s\n", migrationsDir)
-
 			break
 		}
 	}
