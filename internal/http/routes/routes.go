@@ -31,6 +31,7 @@ func (r *Routes) Init() {
 	{
 		user.GET("", r.userController.ListUsers)
 		user.POST("/register", r.userController.CreateUser)
+		user.POST("/login", r.userController.Login)
 		user.GET("/:id", r.userController.GetUser)
 	}
 }

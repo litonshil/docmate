@@ -28,7 +28,6 @@ func NewUserController(
 }
 func (controller *UserController) CreateUser(c echo.Context) error {
 	ctx := middlewares.ContextWithValue(controller.baseCtx, consts.ContextKeyUser, parseUser(c))
-	_ = ctx
 
 	var req types.UserReq
 	if err := c.Bind(&req); err != nil {
@@ -79,4 +78,23 @@ func (controller *UserController) ListUsers(c echo.Context) error {
 	}
 
 	return response.Success(c, "users fetched successfully", users)
+}
+
+func (controller *UserController) Login(c echo.Context) error {
+	ctx := controller.baseCtx
+	var req types.LoginReq
+	if err := c.Bind(&req); err != nil {
+		return response.BadRequest(c, err.Error())
+	}
+
+	if err := req.Validate(); err != nil {
+		return response.BadRequest(c, err.Error())
+	}
+
+	resp, err := controller.userSvc.Login(ctx, req)
+	if err != nil {
+		return response.InternalServerError(c, err.Error())
+	}
+
+	return response.Success(c, "login successful", resp)
 }

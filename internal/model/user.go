@@ -64,10 +64,12 @@ type UserUseCase interface {
 	CreateUser(ctx context.Context, req types.UserReq) (types.UserResp, error)
 	GetUser(ctx context.Context, userID int) (types.UserResp, error)
 	ListUsers(ctx context.Context, req types.UserListReq) (types.PaginatedResponse, error)
+	Login(ctx context.Context, req types.LoginReq) (types.LoginResp, error)
 }
 
 type UserRepo interface {
 	CreateUser(req User) (User, error)
 	GetUser(userID int) (UserResp, error)
+	GetUserByEmail(email string) (UserResp, error)
 	ListUsers(offset, limit int) ([]UserResp, int, error)
 }

@@ -2,12 +2,15 @@ package user
 
 import (
 	"context"
+	"docmate/config"
 	"docmate/internal/consts"
 	"docmate/internal/model"
 	"docmate/types"
 	"fmt"
 	"log/slog"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -94,6 +97,46 @@ func (service *Service) ListUsers(ctx context.Context, req types.UserListReq) (t
 	}
 
 	return resp, nil
+}
+
+func (service *Service) Login(ctx context.Context, req types.LoginReq) (types.LoginResp, error) {
+	user, err := service.repo.GetUserByEmail(req.Email)
+	if err != nil {
+		slog.Error("failed to get user by email", "error", err.Error())
+
+		return types.LoginResp{}, fmt.Errorf("invalid credentials")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		slog.Error("invalid password", "error", err.Error())
+
+		return types.LoginResp{}, fmt.Errorf("invalid credentials")
+	}
+
+	token, err := service.generateJWT(user)
+	if err != nil {
+		slog.Error("failed to generate token", "error", err.Error())
+
+		return types.LoginResp{}, fmt.Errorf("failed to generate token")
+	}
+
+	return types.LoginResp{
+		Token: token,
+		User:  mapToUserResponse(user),
+	}, nil
+}
+
+func (service *Service) generateJWT(user model.UserResp) (string, error) {
+	claims := jwt.MapClaims{
+		"user_id": user.ID,
+		"email":   user.Email,
+		"role":    user.Type,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString([]byte(config.App().JWTSecret))
 }
 
 func mapToUserResponse(user model.UserResp) types.UserResp {

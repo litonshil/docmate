@@ -29,6 +29,15 @@ func (repo *Repository) GetUser(userID int) (model.UserResp, error) {
 	return user, nil
 }
 
+func (repo *Repository) GetUserByEmail(email string) (model.UserResp, error) {
+	var user model.UserResp
+	if err := repo.dbClient(nil).Model(&model.User{}).Where("email = ?", email).First(&user).Error; err != nil {
+		return model.UserResp{}, err
+	}
+
+	return user, nil
+}
+
 func (repo *Repository) ListUsers(offset, limit int) ([]model.UserResp, int, error) {
 	var users []model.UserResp
 	var total int64

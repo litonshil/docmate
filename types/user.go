@@ -67,6 +67,23 @@ type UserRolePermissionsInfo struct {
 	Permissions []string `json:"permissions"`
 }
 
+type LoginReq struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (r LoginReq) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Email, validation.Required),
+		validation.Field(&r.Password, validation.Required),
+	)
+}
+
+type LoginResp struct {
+	Token string   `json:"token"`
+	User  UserResp `json:"user"`
+}
+
 type CurrentUser struct {
 	ID       int    `json:"id"`
 	Email    string `json:"email"`
