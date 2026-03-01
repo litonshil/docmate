@@ -31,13 +31,10 @@ func (service *Service) CreateUser(ctx context.Context, req types.UserReq) (type
 	}
 
 	payload := model.User{
-		Type:      req.Type,
-		UserName:  req.UserName,
-		Password:  string(hashedPass),
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		Email:     req.Email,
-		Phone:     req.Phone,
+		UserName: req.UserName,
+		Password: string(hashedPass),
+		Email:    req.Email,
+		Role:     req.Role,
 	}
 	user, err := service.repo.CreateUser(payload)
 	if err != nil {
@@ -130,7 +127,7 @@ func (service *Service) generateJWT(user model.UserResp) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
-		"role":    user.Type,
+		"role":    user.Role,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	}
 
@@ -142,13 +139,10 @@ func (service *Service) generateJWT(user model.UserResp) (string, error) {
 func mapToUserResponse(user model.UserResp) types.UserResp {
 	resp := types.UserResp{
 		ID:        user.ID,
-		Type:      user.Type,
 		UserName:  user.UserName,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
 		Email:     user.Email,
-		Phone:     user.Phone,
 		Password:  user.Password,
+		Role:      user.Role,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}

@@ -2,11 +2,9 @@ package controllers
 
 import (
 	"context"
-	"docmate/internal/http/middlewares"
 	"docmate/internal/model"
 	"docmate/response"
 	"docmate/types"
-	"docmate/utils/consts"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -27,7 +25,7 @@ func NewUserController(
 	}
 }
 func (controller *UserController) CreateUser(c echo.Context) error {
-	ctx := middlewares.ContextWithValue(controller.baseCtx, consts.ContextKeyUser, parseUser(c))
+	ctx := c.Request().Context()
 
 	var req types.UserReq
 	if err := c.Bind(&req); err != nil {
@@ -81,7 +79,7 @@ func (controller *UserController) ListUsers(c echo.Context) error {
 }
 
 func (controller *UserController) Login(c echo.Context) error {
-	ctx := controller.baseCtx
+	ctx := c.Request().Context()
 	var req types.LoginReq
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, err.Error())

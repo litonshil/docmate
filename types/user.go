@@ -7,33 +7,25 @@ import (
 )
 
 type User struct {
-	ID        int    `json:"id"`
-	Type      string `json:"type"`
-	UserName  string `json:"user_name"`
-	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
+	ID       int    `json:"id"`
+	UserName string `json:"user_name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 type UserReq struct {
-	ID        int    `json:"id"`
-	Type      string `json:"type"`
-	UserName  string `json:"user_name"`
-	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Phone     string `json:"phone"`
+	ID       int    `json:"id"`
+	UserName string `json:"user_name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Role     string `json:"role"`
 }
 
 type UserUpdateReq struct {
-	ID        int    `json:"id" param:"id" query:"id"`
-	UserName  string `json:"user_name"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Phone     string `json:"phone"`
+	ID       int    `json:"id" param:"id" query:"id"`
+	UserName string `json:"user_name"`
+	Email    string `json:"email"`
 }
 
 type LoggedInUser struct {
@@ -46,13 +38,10 @@ type LoggedInUser struct {
 
 type UserResp struct {
 	ID        int        `json:"id"`
-	Type      string     `json:"type"`
 	UserName  string     `json:"user_name"`
-	Password  string     `json:"-"`
-	FirstName string     `json:"first_name"`
-	LastName  string     `json:"last_name"`
 	Email     string     `json:"email"`
-	Phone     string     `json:"phone"`
+	Password  string     `json:"-"`
+	Role      string     `json:"role"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
