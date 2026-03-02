@@ -4,13 +4,13 @@ import (
 	"docmate/internal/model"
 )
 
-func (repo *Repository) CreateUser(user model.User) (model.User, error) {
+func (repo *Repository) Create(user model.User) (model.User, error) {
 	err := repo.client.Create(&user).Error
 
 	return user, err
 }
 
-func (repo *Repository) GetUser(userID int) (model.User, error) {
+func (repo *Repository) Get(userID int) (model.User, error) {
 	var user model.User
 	if err := repo.dbClient(nil).Model(&model.User{}).Where("id = ?", userID).First(&user).Error; err != nil {
 		return model.User{}, err
@@ -19,7 +19,7 @@ func (repo *Repository) GetUser(userID int) (model.User, error) {
 	return user, nil
 }
 
-func (repo *Repository) GetUserByEmail(email string) (model.User, error) {
+func (repo *Repository) GetByEmail(email string) (model.User, error) {
 	var user model.User
 	if err := repo.dbClient(nil).Model(&model.User{}).Where("email = ?", email).First(&user).Error; err != nil {
 		return model.User{}, err
@@ -28,7 +28,7 @@ func (repo *Repository) GetUserByEmail(email string) (model.User, error) {
 	return user, nil
 }
 
-func (repo *Repository) ListUsers(offset, limit int) ([]model.User, int, error) {
+func (repo *Repository) List(offset, limit int) ([]model.User, int, error) {
 	var users []model.User
 	var total int64
 

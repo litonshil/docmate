@@ -15,12 +15,12 @@ import (
 )
 
 type Service struct {
-	repo model.UserRepo
+	userRepo model.UserRepo
 }
 
 func NewService(userRepo model.UserRepo) *Service {
 	return &Service{
-		repo: userRepo,
+		userRepo: userRepo,
 	}
 }
 
@@ -36,7 +36,7 @@ func (service *Service) Create(ctx context.Context, req types.UserReq) (types.Us
 		Email:    req.Email,
 		Role:     req.Role,
 	}
-	user, err := service.repo.CreateUser(payload)
+	user, err := service.userRepo.Create(payload)
 	if err != nil {
 		slog.Error("failed to create user", "error", err.Error())
 
@@ -50,7 +50,7 @@ func (service *Service) Create(ctx context.Context, req types.UserReq) (types.Us
 	return resp, nil
 }
 func (service *Service) Get(ctx context.Context, userID int) (types.UserResp, error) {
-	user, err := service.repo.GetUser(userID)
+	user, err := service.userRepo.Get(userID)
 	if err != nil {
 		slog.Error("failed to get user", "error", err.Error())
 
@@ -69,7 +69,7 @@ func (service *Service) List(ctx context.Context, req types.UserListReq) (types.
 
 	offset := (req.Page - 1) * req.Limit
 
-	users, total, err := service.repo.ListUsers(offset, req.Limit)
+	users, total, err := service.userRepo.List(offset, req.Limit)
 	if err != nil {
 		slog.Error("failed to list users", "error", err)
 
@@ -97,7 +97,7 @@ func (service *Service) List(ctx context.Context, req types.UserListReq) (types.
 }
 
 func (service *Service) Login(ctx context.Context, req types.LoginReq) (types.LoginResp, error) {
-	user, err := service.repo.GetUserByEmail(req.Email)
+	user, err := service.userRepo.GetByEmail(req.Email)
 	if err != nil {
 		slog.Error("failed to get user by email", "error", err.Error())
 

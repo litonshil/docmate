@@ -25,8 +25,8 @@ type UserUseCase interface {
 }
 
 type UserRepo interface {
-	CreateUser(req User) (User, error)
-	GetUser(userID int) (User, error)
-	GetUserByEmail(email string) (User, error)
-	ListUsers(offset, limit int) ([]User, int, error)
+	Create(req User) (User, error)
+	Get(userID int) (User, error)
+	GetByEmail(email string) (User, error)
+	List(offset, limit int) ([]User, int, error)
 }
