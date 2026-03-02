@@ -13,8 +13,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// AuthAdmin middleware verifies the JWT token and checks if the user is an admin.
-func AuthAdmin() echo.MiddlewareFunc {
+// AuthRoles middleware verifies the JWT token and checks if the user has one of the allowed roles.
+func AuthRoles(allowedRoles ...string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
@@ -46,7 +46,21 @@ func AuthAdmin() echo.MiddlewareFunc {
 			}
 
 			role, ok := claims["role"].(string)
-			if !ok || role != "admin" {
+			if !ok {
+				return response.JSON(c, http.StatusForbidden, false, "Access denied", nil, nil)
+			}
+
+			// Check if the user's role is in the allowedRoles list
+			roleAllowed := false
+			for _, allowedRole := range allowedRoles {
+				if role == allowedRole {
+					roleAllowed = true
+
+					break
+				}
+			}
+
+			if !roleAllowed {
 				return response.JSON(c, http.StatusForbidden, false, "Access denied", nil, nil)
 			}
 

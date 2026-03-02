@@ -8,17 +8,20 @@ import (
 )
 
 type Routes struct {
-	echo           *echo.Echo
-	userController *controllers.UserController
+	echo             *echo.Echo
+	userController   *controllers.UserController
+	doctorController *controllers.DoctorController
 }
 
 func New(
 	e *echo.Echo,
 	userController *controllers.UserController,
+	doctorController *controllers.DoctorController,
 ) *Routes {
 	return &Routes{
-		echo:           e,
-		userController: userController,
+		echo:             e,
+		userController:   userController,
+		doctorController: doctorController,
 	}
 }
 
@@ -30,9 +33,17 @@ func (r *Routes) Init() {
 
 	user := v1.Group("/users")
 	{
-		user.GET("", r.userController.List, middlewares.AuthAdmin())
+		user.GET("", r.userController.List, middlewares.AuthRoles("admin"))
 		user.POST("/register", r.userController.Create)
 		user.POST("/login", r.userController.Login)
-		user.GET("/:id", r.userController.Get)
+	}
+
+	doctors := v1.Group("/doctors", middlewares.AuthRoles("admin", "doctor"))
+	{
+		// General CRUD Endpoints
+		doctors.GET("", r.doctorController.List)
+		doctors.POST("", r.doctorController.Create)
+		doctors.GET("/:id", r.doctorController.Get)
+		doctors.PUT("/:id", r.doctorController.Update)
 	}
 }
