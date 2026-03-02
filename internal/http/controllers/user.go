@@ -24,7 +24,7 @@ func NewUserController(
 		userSvc: userSvc,
 	}
 }
-func (controller *UserController) CreateUser(c echo.Context) error {
+func (controller *UserController) Create(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	var req types.UserReq
@@ -36,7 +36,7 @@ func (controller *UserController) CreateUser(c echo.Context) error {
 		return response.BadRequest(c, err.Error())
 	}
 
-	resp, err := controller.userSvc.CreateUser(ctx, req)
+	resp, err := controller.userSvc.Create(ctx, req)
 	if err != nil {
 		return response.InternalServerError(c, err.Error())
 	}
@@ -44,7 +44,7 @@ func (controller *UserController) CreateUser(c echo.Context) error {
 	return response.JSON(c, http.StatusCreated, true, "User created successfully", []types.UserResp{resp}, nil)
 }
 
-func (controller *UserController) GetUser(c echo.Context) error {
+func (controller *UserController) Get(c echo.Context) error {
 	ctx := c.Request().Context()
 	var req types.UserFilter
 	if err := c.Bind(&req); err != nil {
@@ -55,7 +55,7 @@ func (controller *UserController) GetUser(c echo.Context) error {
 		return response.BadRequest(c, err.Error())
 	}
 
-	user, err := controller.userSvc.GetUser(ctx, req.ID)
+	user, err := controller.userSvc.Get(ctx, req.ID)
 	if err != nil {
 		return response.InternalServerError(c, err.Error())
 	}
@@ -63,14 +63,14 @@ func (controller *UserController) GetUser(c echo.Context) error {
 	return response.Success(c, "user fetched successfully", user)
 }
 
-func (controller *UserController) ListUsers(c echo.Context) error {
+func (controller *UserController) List(c echo.Context) error {
 	ctx := c.Request().Context()
 	var req types.UserListReq
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, err.Error())
 	}
 
-	users, err := controller.userSvc.ListUsers(ctx, req)
+	users, err := controller.userSvc.List(ctx, req)
 	if err != nil {
 		return response.InternalServerError(c, err.Error())
 	}

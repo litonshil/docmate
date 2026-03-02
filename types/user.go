@@ -22,20 +22,6 @@ type UserReq struct {
 	Role     string `json:"role"`
 }
 
-type UserUpdateReq struct {
-	ID       int    `json:"id" param:"id" query:"id"`
-	UserName string `json:"user_name"`
-	Email    string `json:"email"`
-}
-
-type LoggedInUser struct {
-	ID          int      `json:"user_id"`
-	AccessUuid  string   `json:"access_uuid"`
-	RefreshUuid string   `json:"refresh_uuid"`
-	Role        string   `json:"role"`
-	Permissions []string `json:"permissions"`
-}
-
 type UserResp struct {
 	ID        int        `json:"id"`
 	UserName  string     `json:"user_name"`
@@ -45,15 +31,6 @@ type UserResp struct {
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at"`
-}
-
-type UserRolePermissionsInfo struct {
-	ID          int      `json:"id"`
-	UserName    string   `json:"user_name"`
-	Email       string   `json:"email"`
-	Role        string   `json:"role"`
-	Password    string   `json:"-"`
-	Permissions []string `json:"permissions"`
 }
 
 type LoginReq struct {
@@ -73,64 +50,13 @@ type LoginResp struct {
 	User  UserResp `json:"user"`
 }
 
-type CurrentUser struct {
-	ID       int    `json:"id"`
-	Email    string `json:"email"`
-	UserName string `json:"user_name"`
-}
-
 type UserFilter struct {
 	ID int `json:"id" query:"id" param:"id"`
-}
-
-type UserWithParamsResp struct {
-	CurrentUser
-	Role        string   `json:"role,omitempty"`
-	Permissions []string `json:"permissions,omitempty"`
-}
-
-type AssignRoleRequest struct {
-	ID     int `json:"id" query:"id" param:"id"`
-	RoleID int `json:"role_id"`
-}
-
-type UserRoleParam struct {
-	ID     int `json:"id" query:"id" param:"id"`
-	RoleID int `json:"role_id" query:"role_id" param:"role_id"`
-}
-
-type DeleteUserRoleReq struct {
-	ID     int `json:"id"`
-	RoleID int `json:"role_id"`
-}
-
-type ResetPasswordReq struct {
-	ID       int    `json:"id"`
-	Password string `json:"password"`
-}
-
-func (rp ResetPasswordReq) Validate() error {
-	return validation.ValidateStruct(&rp,
-		validation.Field(&rp.Password, validation.Required),
-	)
-}
-
-func (uur UserUpdateReq) Validate() error {
-	return validation.ValidateStruct(&uur,
-		validation.Field(&uur.ID, validation.Required),
-	)
 }
 
 func (u UserFilter) Validate() error {
 	return validation.ValidateStruct(&u,
 		validation.Field(&u.ID, validation.Required),
-	)
-}
-
-func (r AssignRoleRequest) Validate() error {
-	return validation.ValidateStruct(&r,
-		validation.Field(&r.ID, validation.Required),
-		validation.Field(&r.RoleID, validation.Required),
 	)
 }
 
@@ -141,23 +67,6 @@ func (ur UserReq) Validate() error {
 		validation.Field(&ur.UserName, validation.Required),
 		validation.Field(&ur.Email, validation.Required),
 		validation.Field(&ur.Password, validation.Required),
-	)
-}
-
-func (u UserRoleParam) Validate() error {
-	return validation.ValidateStruct(&u,
-		validation.Field(&u.ID, validation.Required),
-		validation.Field(&u.RoleID, validation.Required),
-	)
-}
-
-type DeleteUserReq struct {
-	ID int `json:"id" query:"id" param:"id"`
-}
-
-func (r DeleteUserReq) Validate() error {
-	return validation.ValidateStruct(&r,
-		validation.Field(&r.ID, validation.Required),
 	)
 }
 

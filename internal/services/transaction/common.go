@@ -1,4 +1,4 @@
-package services
+package transaction
 
 import (
 	"docmate/internal/model"
@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-func TransactionRollback(
+func Rollback(
 	txc *model.TXClient,
 	entity consts.Entity,
 	action consts.Action,
@@ -31,7 +31,7 @@ func TransactionRollback(
 	return nil
 }
 
-func TransactionCommit(
+func Commit(
 	txc *model.TXClient,
 	entity consts.Entity,
 	action consts.Action,

@@ -24,7 +24,7 @@ func NewService(userRepo model.UserRepo) *Service {
 	}
 }
 
-func (service *Service) CreateUser(ctx context.Context, req types.UserReq) (types.UserResp, error) {
+func (service *Service) Create(ctx context.Context, req types.UserReq) (types.UserResp, error) {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return types.UserResp{}, err
@@ -49,7 +49,7 @@ func (service *Service) CreateUser(ctx context.Context, req types.UserReq) (type
 
 	return resp, nil
 }
-func (service *Service) GetUser(ctx context.Context, userID int) (types.UserResp, error) {
+func (service *Service) Get(ctx context.Context, userID int) (types.UserResp, error) {
 	user, err := service.repo.GetUser(userID)
 	if err != nil {
 		slog.Error("failed to get user", "error", err.Error())
@@ -61,7 +61,7 @@ func (service *Service) GetUser(ctx context.Context, userID int) (types.UserResp
 	return resp, nil
 }
 
-func (service *Service) ListUsers(ctx context.Context, req types.UserListReq) (types.PaginatedResponse, error) {
+func (service *Service) List(ctx context.Context, req types.UserListReq) (types.PaginatedResponse, error) {
 	if req.Page == 0 || req.Limit == 0 {
 		req.Page = consts.Page
 		req.Limit = consts.Limit
@@ -123,7 +123,7 @@ func (service *Service) Login(ctx context.Context, req types.LoginReq) (types.Lo
 	}, nil
 }
 
-func (service *Service) generateJWT(user model.UserResp) (string, error) {
+func (service *Service) generateJWT(user model.User) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"email":   user.Email,
@@ -136,7 +136,7 @@ func (service *Service) generateJWT(user model.UserResp) (string, error) {
 	return token.SignedString([]byte(config.App().JWTSecret))
 }
 
-func mapToUserResponse(user model.UserResp) types.UserResp {
+func mapToUserResponse(user model.User) types.UserResp {
 	resp := types.UserResp{
 		ID:        user.ID,
 		UserName:  user.UserName,

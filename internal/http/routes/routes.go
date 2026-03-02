@@ -29,9 +29,9 @@ func (r *Routes) Init() {
 
 	user := v1.Group("/users")
 	{
-		user.GET("", r.userController.ListUsers)
-		user.POST("/register", r.userController.CreateUser)
+		user.GET("", r.userController.List)
+		user.POST("/register", r.userController.Create)
 		user.POST("/login", r.userController.Login)
-		user.GET("/:id", r.userController.GetUser)
+		user.GET("/:id", r.userController.Get)
 	}
 }
