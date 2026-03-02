@@ -2,6 +2,7 @@ package routes
 
 import (
 	"docmate/internal/http/controllers"
+	"docmate/internal/http/middlewares"
 
 	"github.com/labstack/echo/v4"
 )
@@ -29,7 +30,7 @@ func (r *Routes) Init() {
 
 	user := v1.Group("/users")
 	{
-		user.GET("", r.userController.List)
+		user.GET("", r.userController.List, middlewares.AuthAdmin())
 		user.POST("/register", r.userController.Create)
 		user.POST("/login", r.userController.Login)
 		user.GET("/:id", r.userController.Get)
