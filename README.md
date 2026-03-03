@@ -42,7 +42,7 @@ Core foundation of the system.
 **Basic patient fields:**
 
 - Name
-- Age / Date of birth
+- Age
 - Gender
 - Phone
 - Address

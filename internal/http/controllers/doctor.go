@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"docmate/internal/consts"
 	"docmate/internal/model"
 	"docmate/response"
 	"docmate/types"
@@ -78,7 +79,7 @@ func (controller *DoctorController) Update(c echo.Context) error {
 	}
 
 	// 2. Verify Authorization (Owner or Admin)
-	if existing.UserID != user.ID && user.Role != "admin" {
+	if existing.UserID != user.ID && user.Role != consts.RoleAdmin {
 		return response.Unauthorized(c, "unauthorized to update this doctor profile")
 	}
 
@@ -119,7 +120,7 @@ func (controller *DoctorController) Get(c echo.Context) error {
 func (controller *DoctorController) List(c echo.Context) error {
 	ctx := c.Request().Context()
 	user, err := contextutil.GetUserFromContext(c)
-	if err != nil || user.Role != "admin" {
+	if err != nil || user.Role != consts.RoleAdmin {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 

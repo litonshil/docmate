@@ -8,6 +8,7 @@ import (
 	httpServer "docmate/internal/http/server"
 	"docmate/internal/repositories/db"
 	doctorservice "docmate/internal/services/doctor"
+	patientservice "docmate/internal/services/patient"
 	txservice "docmate/internal/services/transaction"
 	userservice "docmate/internal/services/user"
 	"os"
@@ -38,13 +39,15 @@ func MountRoutes(ctx context.Context, e *echo.Echo) {
 	txsvc := txservice.NewDBTransaction(dbRepo)
 	usersvc := userservice.NewService(dbRepo)
 	doctorsvc := doctorservice.NewService(dbRepo)
+	patientsvc := patientservice.NewService(dbRepo)
 
 	_ = txsvc
 
 	userController := controllers.NewUserController(ctx, usersvc)
 	doctorController := controllers.NewDoctorController(ctx, doctorsvc)
+	patientController := controllers.NewPatientController(ctx, patientsvc, dbRepo)
 
-	routes := httpRoutes.New(e, userController, doctorController)
+	routes := httpRoutes.New(e, userController, doctorController, patientController)
 	routes.Init()
 }
 
