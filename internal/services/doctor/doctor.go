@@ -19,7 +19,15 @@ func NewService(doctorRepo model.DoctorRepo) *Service {
 }
 
 func (service *Service) Create(ctx context.Context, req types.DoctorReq) (types.DoctorResp, error) {
+	// Check if already exists so we don't duplicate
+	existing, err := service.doctorRepo.GetDoctorByUserID(req.UserID)
+	if err == nil && existing.ID != 0 {
+		return types.DoctorResp{}, fmt.Errorf("doctor profile already exists for this user")
+	}
+
 	payload := model.Doctor{
+		UserID:         req.UserID,
+		Email:          req.Email, // Link to the user's primary email automatically
 		FullName:       req.FullName,
 		Degree:         req.Degree,
 		Specialization: req.Specialization,
@@ -38,9 +46,17 @@ func (service *Service) Create(ctx context.Context, req types.DoctorReq) (types.
 	return mapToDoctorResponse(doctor), nil
 }
 
-func (service *Service) Update(ctx context.Context, id int, req types.DoctorReq) (types.DoctorResp, error) {
+func (service *Service) Update(ctx context.Context, req types.DoctorUpdateReq) (types.DoctorResp, error) {
+	// 1. Get the existing profile to verify properties that should not be updated (Email, UserID)
+	existing, err := service.doctorRepo.GetDoctorByID(req.ID)
+	if err != nil {
+		return types.DoctorResp{}, fmt.Errorf("failed to retrieve doctor profile: %w", err)
+	}
+
 	payload := model.Doctor{
-		ID:             id,
+		ID:             req.ID,
+		UserID:         existing.UserID,
+		Email:          existing.Email,
 		FullName:       req.FullName,
 		Degree:         req.Degree,
 		Specialization: req.Specialization,
@@ -59,8 +75,8 @@ func (service *Service) Update(ctx context.Context, id int, req types.DoctorReq)
 	return mapToDoctorResponse(doctor), nil
 }
 
-func (service *Service) Get(ctx context.Context, id int) (types.DoctorResp, error) {
-	doctor, err := service.doctorRepo.GetDoctorByID(id)
+func (service *Service) Get(ctx context.Context, filter types.DoctorFilter) (types.DoctorResp, error) {
+	doctor, err := service.doctorRepo.GetDoctorByID(filter.ID)
 	if err != nil {
 		slog.Error("failed to get doctor profile by ID", "error", err.Error())
 

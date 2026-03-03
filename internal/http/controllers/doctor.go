@@ -5,6 +5,7 @@ import (
 	"docmate/internal/model"
 	"docmate/response"
 	"docmate/types"
+	"docmate/utils/contextutil"
 
 	"github.com/labstack/echo/v4"
 )
@@ -26,6 +27,10 @@ func NewDoctorController(
 
 func (controller *DoctorController) Create(c echo.Context) error {
 	ctx := c.Request().Context()
+	user, err := contextutil.GetUserFromContext(c)
+	if err != nil {
+		return response.Unauthorized(c, "Unauthorized")
+	}
 
 	var req types.DoctorReq
 	if err := c.Bind(&req); err != nil {
@@ -35,6 +40,9 @@ func (controller *DoctorController) Create(c echo.Context) error {
 	if err := req.Validate(); err != nil {
 		return response.BadRequest(c, err.Error())
 	}
+
+	req.UserID = user.ID
+	req.Email = user.Email
 
 	resp, err := controller.doctorSvc.Create(ctx, req)
 	if err != nil {
@@ -46,17 +54,12 @@ func (controller *DoctorController) Create(c echo.Context) error {
 
 func (controller *DoctorController) Update(c echo.Context) error {
 	ctx := c.Request().Context()
-
-	var filter types.DoctorFilter
-	if err := c.Bind(&filter); err != nil {
-		return response.BadRequest(c, "invalid doctor id")
+	user, err := contextutil.GetUserFromContext(c)
+	if err != nil {
+		return response.Unauthorized(c, "Unauthorized")
 	}
 
-	if err := filter.Validate(); err != nil {
-		return response.BadRequest(c, err.Error())
-	}
-
-	var req types.DoctorReq
+	var req types.DoctorUpdateReq
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, err.Error())
 	}
@@ -65,7 +68,21 @@ func (controller *DoctorController) Update(c echo.Context) error {
 		return response.BadRequest(c, err.Error())
 	}
 
-	resp, err := controller.doctorSvc.Update(ctx, filter.ID, req)
+	req.UserID = user.ID
+
+	// 1. Get existing profile to verify authorization
+	filter := types.DoctorFilter{ID: req.ID}
+	existing, err := controller.doctorSvc.Get(ctx, filter)
+	if err != nil {
+		return response.InternalServerError(c, "failed to retrieve doctor profile")
+	}
+
+	// 2. Verify Authorization (Owner or Admin)
+	if existing.UserID != user.ID && user.Role != "admin" {
+		return response.Unauthorized(c, "unauthorized to update this doctor profile")
+	}
+
+	resp, err := controller.doctorSvc.Update(ctx, req)
 	if err != nil {
 		return response.InternalServerError(c, err.Error())
 	}
@@ -75,6 +92,10 @@ func (controller *DoctorController) Update(c echo.Context) error {
 
 func (controller *DoctorController) Get(c echo.Context) error {
 	ctx := c.Request().Context()
+	user, err := contextutil.GetUserFromContext(c)
+	if err != nil {
+		return response.Unauthorized(c, "Unauthorized")
+	}
 
 	var filter types.DoctorFilter
 	if err := c.Bind(&filter); err != nil {
@@ -85,7 +106,9 @@ func (controller *DoctorController) Get(c echo.Context) error {
 		return response.BadRequest(c, err.Error())
 	}
 
-	doctor, err := controller.doctorSvc.Get(ctx, filter.ID)
+	filter.UserID = user.ID
+
+	doctor, err := controller.doctorSvc.Get(ctx, filter)
 	if err != nil {
 		return response.InternalServerError(c, "failed to get doctor")
 	}
@@ -95,6 +118,10 @@ func (controller *DoctorController) Get(c echo.Context) error {
 
 func (controller *DoctorController) List(c echo.Context) error {
 	ctx := c.Request().Context()
+	user, err := contextutil.GetUserFromContext(c)
+	if err != nil || user.Role != "admin" {
+		return response.Unauthorized(c, "Unauthorized")
+	}
 
 	var req types.DoctorListReq
 	if err := c.Bind(&req); err != nil {

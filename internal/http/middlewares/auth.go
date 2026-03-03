@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"docmate/config"
 	"docmate/internal/model"
 	"docmate/response"
@@ -74,8 +75,12 @@ func AuthRoles(allowedRoles ...string) echo.MiddlewareFunc {
 				Role:     role,
 			}
 
-			// Store user details in context
+			// Store user details in echo context
 			c.Set("user", user)
+
+			// Store user details in standard request context
+			ctx := context.WithValue(c.Request().Context(), model.UserContextKey, user)
+			c.SetRequest(c.Request().WithContext(ctx))
 
 			return next(c)
 		}

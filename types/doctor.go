@@ -7,6 +7,9 @@ import (
 )
 
 type DoctorReq struct {
+	ID             int      `json:"-"`
+	UserID         int      `json:"-"`
+	Email          string   `json:"-"`
 	FullName       string   `json:"full_name"`
 	Degree         []string `json:"degree"`
 	Specialization []string `json:"specialization"`
@@ -20,6 +23,24 @@ func (req DoctorReq) Validate() error {
 		validation.Field(&req.FullName, validation.Required, validation.Length(2, 150)),
 		validation.Field(&req.Degree, validation.Required),
 		validation.Field(&req.Specialization, validation.Required),
+	)
+}
+
+type DoctorUpdateReq struct {
+	ID             int      `json:"-" param:"id"`
+	UserID         int      `json:"-"`
+	FullName       string   `json:"full_name"`
+	Degree         []string `json:"degree"`
+	Specialization []string `json:"specialization"`
+	Phone          string   `json:"phone"`
+	Bio            string   `json:"bio"`
+	SignatureURL   string   `json:"signature_url"`
+}
+
+func (req DoctorUpdateReq) Validate() error {
+	return validation.ValidateStruct(&req,
+		validation.Field(&req.ID, validation.Required),
+		validation.Field(&req.FullName, validation.Length(2, 150)),
 	)
 }
 
@@ -38,11 +59,14 @@ type DoctorResp struct {
 }
 
 type DoctorListReq struct {
+	UserID   int    `json:"user_id"`
+	UserRole string `json:"user_role"`
 	Pagination
 }
 
 type DoctorFilter struct {
-	ID int `json:"id" query:"id" param:"id"`
+	ID     int `json:"id" query:"id" param:"id"`
+	UserID int `json:"user_id"`
 }
 
 func (f DoctorFilter) Validate() error {

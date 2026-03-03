@@ -23,8 +23,8 @@ type Doctor struct {
 
 type DoctorUseCase interface {
 	Create(ctx context.Context, req types.DoctorReq) (types.DoctorResp, error)
-	Get(ctx context.Context, id int) (types.DoctorResp, error)
-	Update(ctx context.Context, id int, req types.DoctorReq) (types.DoctorResp, error)
+	Get(ctx context.Context, filter types.DoctorFilter) (types.DoctorResp, error)
+	Update(ctx context.Context, req types.DoctorUpdateReq) (types.DoctorResp, error)
 	List(ctx context.Context, req types.DoctorListReq) (types.PaginatedDoctorResp, error)
 }
 

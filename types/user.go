@@ -14,6 +14,13 @@ type User struct {
 	Role     string `json:"role"`
 }
 
+type AuthUser struct {
+	ID       int    `json:"id"`
+	UserName string `json:"user_name"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
+}
+
 type UserReq struct {
 	ID       int    `json:"id"`
 	UserName string `json:"user_name"`

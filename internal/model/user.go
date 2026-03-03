@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+type ContextKey string
+
+const UserContextKey ContextKey = "user"
+
 type User struct {
 	ID        int        `json:"id"`
 	UserName  string     `json:"user_name"`
