@@ -21,7 +21,7 @@ func (repo *Repository) UpdateDoctor(doctor model.Doctor) (model.Doctor, error) 
 
 func (repo *Repository) GetDoctorByID(id int) (model.Doctor, error) {
 	var doctor model.Doctor
-	if err := repo.dbClient(nil).Model(&model.Doctor{}).Where("id = ?", id).First(&doctor).Error; err != nil {
+	if err := repo.client.Model(&model.Doctor{}).Where("id = ?", id).First(&doctor).Error; err != nil {
 		return model.Doctor{}, err
 	}
 
@@ -45,7 +45,7 @@ func (repo *Repository) ListDoctors(offset, limit int) ([]model.Doctor, int, err
 
 func (repo *Repository) GetDoctorByUserID(userID int) (model.Doctor, error) {
 	var doctor model.Doctor
-	if err := repo.dbClient(nil).Model(&model.Doctor{}).Where("user_id = ?", userID).First(&doctor).Error; err != nil {
+	if err := repo.client.Model(&model.Doctor{}).Where("user_id = ?", userID).First(&doctor).Error; err != nil {
 		return model.Doctor{}, err
 	}
 

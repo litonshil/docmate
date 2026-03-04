@@ -13,6 +13,7 @@ type Routes struct {
 	userController    *controllers.UserController
 	doctorController  *controllers.DoctorController
 	patientController *controllers.PatientController
+	chamberController *controllers.ChamberController
 }
 
 func New(
@@ -20,12 +21,14 @@ func New(
 	userController *controllers.UserController,
 	doctorController *controllers.DoctorController,
 	patientController *controllers.PatientController,
+	chamberController *controllers.ChamberController,
 ) *Routes {
 	return &Routes{
 		echo:              e,
 		userController:    userController,
 		doctorController:  doctorController,
 		patientController: patientController,
+		chamberController: chamberController,
 	}
 }
 
@@ -44,7 +47,6 @@ func (r *Routes) Init() {
 
 	doctors := v1.Group("/doctors", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
 	{
-		// General CRUD Endpoints
 		doctors.GET("", r.doctorController.List)
 		doctors.POST("", r.doctorController.Create)
 		doctors.GET("/:id", r.doctorController.Get)
@@ -53,10 +55,17 @@ func (r *Routes) Init() {
 
 	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
 	{
-		// General CRUD Endpoints
 		patients.GET("", r.patientController.List)
 		patients.POST("", r.patientController.Create)
 		patients.GET("/:id", r.patientController.Get)
 		patients.PUT("/:id", r.patientController.Update)
+	}
+
+	chambers := v1.Group("/doctors/:doctor_id/chambers", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	{
+		chambers.GET("", r.chamberController.List)
+		chambers.POST("", r.chamberController.Create)
+		chambers.GET("/:id", r.chamberController.Get)
+		chambers.PUT("/:id", r.chamberController.Update)
 	}
 }
