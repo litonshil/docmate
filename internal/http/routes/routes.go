@@ -53,7 +53,7 @@ func (r *Routes) Init() {
 		doctors.PUT("/:id", r.doctorController.Update)
 	}
 
-	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleDoctor))
 	{
 		patients.GET("", r.patientController.List)
 		patients.POST("", r.patientController.Create)

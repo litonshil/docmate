@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"docmate/internal/consts"
 	"docmate/internal/model"
 	"docmate/response"
 	"docmate/types"
@@ -86,8 +85,8 @@ func (controller *PatientController) Update(c echo.Context) error {
 		return response.InternalServerError(c, "failed to retrieve patient profile")
 	}
 
-	// 2. Verify Authorization (Owner or Admin)
-	if existing.DoctorID != doctor.ID && user.Role != consts.RoleAdmin {
+	// 2. Verify Authorization (Owner)
+	if existing.DoctorID != doctor.ID {
 		return response.Unauthorized(c, "unauthorized to update this patient profile")
 	}
 
@@ -126,7 +125,7 @@ func (controller *PatientController) Get(c echo.Context) error {
 	}
 
 	// Verify Ownership
-	if patient.DoctorID != doctor.ID && user.Role != consts.RoleAdmin {
+	if patient.DoctorID != doctor.ID {
 		return response.Unauthorized(c, "unauthorized to view this patient profile")
 	}
 
