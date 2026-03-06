@@ -13,8 +13,9 @@ type Routes struct {
 	doctorController   *controllers.DoctorController
 	patientController  *controllers.PatientController
 	chamberController  *controllers.ChamberController
-	medicineController *controllers.MedicineController
-	echo               *echo.Echo
+	medicineController     *controllers.MedicineController
+	prescriptionController *controllers.PrescriptionController
+	echo                   *echo.Echo
 }
 
 func New(
@@ -24,14 +25,16 @@ func New(
 	patientController *controllers.PatientController,
 	chamberController *controllers.ChamberController,
 	medicineController *controllers.MedicineController,
+	prescriptionController *controllers.PrescriptionController,
 ) *Routes {
 	return &Routes{
 		echo:               e,
 		userController:     userController,
 		doctorController:   doctorController,
 		patientController:  patientController,
-		chamberController:  chamberController,
-		medicineController: medicineController,
+		chamberController:      chamberController,
+		medicineController:     medicineController,
+		prescriptionController: prescriptionController,
 	}
 }
 
@@ -80,5 +83,13 @@ func (r *Routes) Init() {
 		medicines.GET("/:id", r.medicineController.Get)
 		medicines.PUT("/:id", r.medicineController.Update)
 		medicines.DELETE("/:id", r.medicineController.Delete)
+	}
+
+	prescriptions := v1.Group("/prescriptions", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	{
+		prescriptions.GET("", r.prescriptionController.List)
+		prescriptions.POST("", r.prescriptionController.Create)
+		prescriptions.GET("/:id", r.prescriptionController.Get)
+		prescriptions.PUT("/:id", r.prescriptionController.Update)
 	}
 }

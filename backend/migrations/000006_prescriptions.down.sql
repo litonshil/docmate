@@ -1,4 +1,5 @@
 DROP INDEX IF EXISTS idx_prescriptions_deleted_at;
+DROP INDEX IF EXISTS idx_prescriptions_status;
 DROP INDEX IF EXISTS idx_prescriptions_investigations;
 DROP INDEX IF EXISTS idx_prescriptions_medications;
 DROP INDEX IF EXISTS idx_prescriptions_diagnosis;

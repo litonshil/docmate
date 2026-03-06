@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
-import { PrescriptionReq, Vitals, Medication } from '@/types/prescription';
+import { PrescriptionReq, PrescriptionResp, Vitals, Medication } from '@/types/prescription';
 import MedicineAutocomplete from '@/components/MedicineAutocomplete';
 
 interface Patient {
@@ -17,12 +17,15 @@ interface Chamber {
     name: string;
 }
 
-export default function NewPrescription() {
+export default function EditPrescription() {
     const router = useRouter();
+    const params = useParams();
+    const id = params.id as string;
     const { success, error: errorToast } = useToast();
 
     const [patients, setPatients] = useState<Patient[]>([]);
     const [chambers, setChambers] = useState<Chamber[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     // Form State
     const [selectedPatient, setSelectedPatient] = useState<number>(0);
@@ -39,6 +42,7 @@ export default function NewPrescription() {
     const [investigations, setInvestigations] = useState<string>('');
     const [advice, setAdvice] = useState<string>('');
     const [followUpDate, setFollowUpDate] = useState<string>('');
+    const [status, setStatus] = useState<'draft' | 'finalized'>('draft');
 
     const [medications, setMedications] = useState<Medication[]>([
         { medicine_name: '', dosage: '', frequency: '', duration: '', instructions: '' }
@@ -46,10 +50,10 @@ export default function NewPrescription() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchInitialData();
+    }, [id]);
 
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
         const token = localStorage.getItem("docmate_token");
         if (!token) return;
 
@@ -79,10 +83,40 @@ export default function NewPrescription() {
                 if (chamData.success) {
                     setChambers(chamData.data.records);
                 }
+
+                // Fetch existing prescription
+                const pxRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/v1/prescriptions/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const pxData = await pxRes.json();
+                if (pxData.success) {
+                    const px = pxData.data as PrescriptionResp;
+
+                    if (px.status === 'finalized') {
+                        errorToast("Finalized prescriptions cannot be edited");
+                        router.push('/prescriptions');
+                        return;
+                    }
+
+                    setSelectedPatient(px.patient_id);
+                    setSelectedChamber(px.chamber_id);
+                    setVitals(px.vitals);
+                    setComplaints(px.chief_complaints.join(', '));
+                    setDiagnosis(px.diagnosis.join(', '));
+                    setInvestigations(px.investigations.join(', '));
+                    setAdvice(px.advice);
+                    setStatus(px.status);
+                    if (px.follow_up_date) {
+                        setFollowUpDate(new Date(px.follow_up_date).toISOString().split('T')[0]);
+                    }
+                    setMedications(px.medications.length > 0 ? px.medications : [{ medicine_name: '', dosage: '', frequency: '', duration: '', instructions: '' }]);
+                }
             }
         } catch (error) {
-            console.error("Failed to load initial data", error);
-            errorToast("Failed to load patient or chamber data");
+            console.error("Failed to load data", error);
+            errorToast("Failed to load prescription data");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -100,7 +134,7 @@ export default function NewPrescription() {
         setMedications(newMeds);
     };
 
-    const handleSave = async (status: 'draft' | 'finalized') => {
+    const handleUpdate = async (newStatus: 'draft' | 'finalized') => {
         if (!selectedPatient || !selectedChamber) {
             errorToast("Please select both a patient and a chamber");
             return;
@@ -109,23 +143,22 @@ export default function NewPrescription() {
         setIsSubmitting(true);
         const token = localStorage.getItem("docmate_token");
 
-        // Format data: Split comma separated strings into arrays and trim whitespace
         const payload: PrescriptionReq = {
             patient_id: selectedPatient,
             chamber_id: selectedChamber,
             vitals: vitals,
-            chief_complaints: complaints.split(',').map(s => s.trim()).filter(Boolean),
-            diagnosis: diagnosis.split(',').map(s => s.trim()).filter(Boolean),
-            investigations: investigations.split(',').map(s => s.trim()).filter(Boolean),
+            chief_complaints: complaints.split(',').map((s: string) => s.trim()).filter(Boolean),
+            diagnosis: diagnosis.split(',').map((s: string) => s.trim()).filter(Boolean),
+            investigations: investigations.split(',').map((s: string) => s.trim()).filter(Boolean),
             advice: advice,
-            status: status,
+            status: newStatus,
             follow_up_date: followUpDate ? new Date(followUpDate).toISOString() : undefined,
             medications: medications.filter(m => m.medicine_name.trim() !== ''),
         };
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/v1/prescriptions`, {
-                method: "POST",
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/v1/prescriptions/${id}`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`
@@ -136,29 +169,33 @@ export default function NewPrescription() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                success(`Prescription ${status === 'finalized' ? 'finalized' : 'saved as draft'} successfully`);
-                if (status === 'finalized') {
-                    router.push(`/prescriptions/${data.data.id}/print`);
+                success(`Prescription ${newStatus === 'finalized' ? 'finalized' : 'updated'} successfully`);
+                if (newStatus === 'finalized') {
+                    router.push(`/prescriptions/${id}/print`);
                 } else {
                     router.push('/prescriptions');
                 }
             } else {
-                errorToast(data.message || `Failed to ${status} prescription`);
+                errorToast(data.message || `Failed to ${newStatus} prescription`);
             }
         } catch (error) {
-            console.error("Error creating prescription:", error);
+            console.error("Error updating prescription:", error);
             errorToast("An unexpected error occurred");
         } finally {
             setIsSubmitting(false);
         }
     };
 
+    if (isLoading) {
+        return <div className="p-8 text-center">Loading prescription...</div>;
+    }
+
     return (
         <div className="p-8 max-w-5xl mx-auto">
             <div className="mb-8 flex justify-between items-start">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Create Prescription</h1>
-                    <p className="text-slate-500">Generating digital prescription</p>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Edit Prescription</h1>
+                    <p className="text-slate-500">Updating draft prescription</p>
                 </div>
                 <Link href="/prescriptions" className="text-sm font-bold text-slate-400 hover:text-slate-900 transition flex items-center gap-1">
                     ← Back to List
@@ -366,14 +403,14 @@ export default function NewPrescription() {
                     <div className="flex justify-between items-center bg-slate-50 -m-8 mt-8 p-8 rounded-b-2xl border-t border-border">
                         <div className="flex gap-4">
                             <button
-                                onClick={() => handleSave('draft')}
+                                onClick={() => handleUpdate('draft')}
                                 disabled={isSubmitting}
                                 className="px-6 py-2 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-white transition disabled:opacity-50"
                             >
-                                {isSubmitting ? 'Saving...' : 'Save as Draft'}
+                                {isSubmitting ? 'Updating...' : 'Update Draft'}
                             </button>
                             <button
-                                onClick={() => handleSave('finalized')}
+                                onClick={() => handleUpdate('finalized')}
                                 disabled={isSubmitting}
                                 className="px-6 py-2 rounded-xl bg-primary text-white font-bold medical-gradient shadow-lg disabled:opacity-50"
                             >

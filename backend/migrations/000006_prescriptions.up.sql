@@ -17,12 +17,12 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     vitals              JSONB               NOT NULL DEFAULT '{}',
 
     -- Chief Complaints
-    -- e.g. '{"Headache", "Fever", "Nausea"}'
-    chief_complaints    TEXT[]              NOT NULL DEFAULT '{}',
+    -- e.g. '["Headache", "Fever", "Nausea"]'
+    chief_complaints    JSONB               NOT NULL DEFAULT '[]',
 
     -- Diagnosis
-    -- e.g. '{"Hypertension", "Type 2 Diabetes"}'
-    diagnosis           TEXT[]              NOT NULL DEFAULT '{}',
+    -- e.g. '["Hypertension", "Type 2 Diabetes"]'
+    diagnosis           JSONB               NOT NULL DEFAULT '[]',
 
     -- Medications
     -- e.g.
@@ -44,13 +44,15 @@ CREATE TABLE IF NOT EXISTS prescriptions (
     medications         JSONB               NOT NULL DEFAULT '[]',
 
     -- Investigations
-    -- e.g. '{"CBC", "Blood Sugar (F)", "Chest X-Ray"}'
-    investigations      TEXT[]              NOT NULL DEFAULT '{}',
+    -- e.g. '["CBC", "Blood Sugar (F)", "Chest X-Ray"]'
+    investigations      JSONB               NOT NULL DEFAULT '[]',
 
     -- Advice & Follow Up
     advice              TEXT,
     follow_up_date      DATE,
     file_url            VARCHAR(255) NULL,
+
+    status              VARCHAR(20)         NOT NULL DEFAULT 'draft',
 
     created_at          TIMESTAMPTZ         NOT NULL DEFAULT NOW(),
     updated_at          TIMESTAMPTZ         NOT NULL DEFAULT NOW(),
@@ -66,4 +68,5 @@ CREATE INDEX idx_prescriptions_chief_complaints ON prescriptions USING GIN (chie
 CREATE INDEX idx_prescriptions_diagnosis        ON prescriptions USING GIN (diagnosis);
 CREATE INDEX idx_prescriptions_medications      ON prescriptions USING GIN (medications);
 CREATE INDEX idx_prescriptions_investigations   ON prescriptions USING GIN (investigations);
+CREATE INDEX idx_prescriptions_status           ON prescriptions (status);
 CREATE INDEX idx_prescriptions_deleted_at       ON prescriptions (deleted_at);
