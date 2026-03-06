@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fa6e81af-5d00-408a-a274-91aa2c742da2" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/cmd/serve.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/cmd/serve.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/http/controllers/doctor.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/http/controllers/doctor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/http/controllers/patient.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/http/controllers/patient.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/http/middlewares/auth.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/http/middlewares/auth.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/http/middlewares/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/http/middlewares/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/http/routes/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/http/routes/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/model/doctor.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/model/doctor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/services/doctor/doctor.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/services/doctor/doctor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/internal/services/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/internal/services/user/user.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/migrations/000002_doctors.up.sql" beforeDir="false" afterPath="$PROJECT_DIR$/backend/migrations/000002_doctors.up.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/types/doctor.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/types/doctor.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/types/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/backend/types/user.go" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="GOROOT" url="file://$USER_HOME$/sdk/go1.25.4" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/backend" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="3A4bzNK7KLaLqCgodLDILTAN5hm" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.GoLinterPluginOnboarding&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.GoLinterPluginStorageMigration&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/liton/go_workspace/doc-mate&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/cmd" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-gosdk-f466f9b0953e-146d08934cbf-org.jetbrains.plugins.go.sharedIndexes.bundled-GO-252.27397.100" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-GO-252.27397.100" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fa6e81af-5d00-408a-a274-91aa2c742da2" name="Changes" comment="" />
+      <created>1771855051480</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1771855051480</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VgoProject">
+    <settings-migrated>true</settings-migrated>
+  </component>
+</project>
