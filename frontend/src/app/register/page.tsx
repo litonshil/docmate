@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useToast } from "@/components/Toast";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -11,6 +12,8 @@ export default function RegisterPage() {
         email: '',
         password: '',
     });
+
+    const { success: successToast, error: errorToast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,14 +36,14 @@ export default function RegisterPage() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                alert('Registration successful! Please log in.');
+                successToast('Registration successful! Please log in.');
                 router.push('/login');
             } else {
-                alert(data.message || 'Registration failed');
+                errorToast(data.message || 'Registration failed');
             }
         } catch (error) {
             console.error('Registration error:', error);
-            alert('An error occurred during registration. Please ensure the backend is running.');
+            errorToast('An error occurred during registration. Please ensure the backend is running.');
         }
     };
 

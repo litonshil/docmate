@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 interface Medicine {
     id: number;
@@ -55,6 +56,8 @@ export default function MedicinesPage() {
         }
     }, []);
 
+    const { success: successToast, error: errorToast } = useToast();
+
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             fetchMedicines(1, searchTerm);
@@ -76,14 +79,14 @@ export default function MedicinesPage() {
             });
             const data = await response.json();
             if (response.ok && data.success) {
-                alert("Medicine deleted successfully");
+                successToast("Medicine deleted successfully");
                 fetchMedicines(pagination.page, searchTerm);
             } else {
-                alert(data.message || "Failed to delete medicine");
+                errorToast(data.message || "Failed to delete medicine");
             }
         } catch (error) {
             console.error("Error deleting medicine:", error);
-            alert("An error occurred while deleting the medicine");
+            errorToast("An error occurred while deleting the medicine");
         }
     };
 

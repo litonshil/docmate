@@ -3,6 +3,7 @@
 import React, { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 interface EditMedicinePageProps {
     params: Promise<{ id: string }>;
@@ -12,6 +13,7 @@ export default function EditMedicinePage({ params }: EditMedicinePageProps) {
     const router = useRouter();
     const resolvedParams = use(params);
     const medicineId = resolvedParams.id;
+    const { success: successToast, error: errorToast } = useToast();
 
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,19 +49,19 @@ export default function EditMedicinePage({ params }: EditMedicinePageProps) {
                         is_active: m.is_active
                     });
                 } else {
-                    alert("Medicine not found");
+                    errorToast("Medicine not found");
                     router.push('/medicines');
                 }
             } catch (error) {
                 console.error("Error fetching medicine:", error);
-                alert("An error occurred while fetching medicine details");
+                errorToast("An error occurred while fetching medicine details");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchMedicine();
-    }, [medicineId, router]);
+    }, [medicineId, router, errorToast]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,14 +80,14 @@ export default function EditMedicinePage({ params }: EditMedicinePageProps) {
 
             const data = await response.json();
             if (response.ok && data.success) {
-                alert("Medicine updated successfully");
+                successToast("Medicine updated successfully");
                 router.push('/medicines');
             } else {
-                alert(data.message || "Failed to update medicine");
+                errorToast(data.message || "Failed to update medicine");
             }
         } catch (error) {
             console.error("Error updating medicine:", error);
-            alert("An error occurred while updating the medicine");
+            errorToast("An error occurred while updating the medicine");
         } finally {
             setIsSubmitting(false);
         }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from "@/components/Toast";
 
 export default function ProfileSetupPage() {
     const router = useRouter();
@@ -13,6 +14,8 @@ export default function ProfileSetupPage() {
         bio: '',
     });
 
+    const { success: successToast, error: errorToast } = useToast();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Profile Setup (Doctors table):', formData);
@@ -20,7 +23,7 @@ export default function ProfileSetupPage() {
         try {
             const token = typeof window !== 'undefined' ? localStorage.getItem('docmate_token') : '';
             if (!token) {
-                alert('Authentication token missing. Please log in again.');
+                errorToast('Authentication token missing. Please log in again.');
                 router.push('/login');
                 return;
             }
@@ -48,14 +51,14 @@ export default function ProfileSetupPage() {
                 if (typeof window !== 'undefined') {
                     localStorage.setItem('doctorProfileComplete', 'true');
                 }
-                alert('Profile setup successful!');
+                successToast('Profile setup successful!');
                 router.push('/');
             } else {
-                alert(data.message || 'Profile setup failed');
+                errorToast(data.message || 'Profile setup failed');
             }
         } catch (error) {
             console.error('Profile setup error:', error);
-            alert('An error occurred. Please ensure the backend is running.');
+            errorToast('An error occurred. Please ensure the backend is running.');
         }
     };
 

@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 export default function NewMedicinePage() {
     const router = useRouter();
+    const { success: successToast, error: errorToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         brand_name: '',
@@ -33,14 +35,14 @@ export default function NewMedicinePage() {
 
             const data = await response.json();
             if (response.ok && data.success) {
-                alert("Medicine added successfully");
+                successToast("Medicine added successfully");
                 router.push('/medicines');
             } else {
-                alert(data.message || "Failed to add medicine");
+                errorToast(data.message || "Failed to add medicine");
             }
         } catch (error) {
             console.error("Error adding medicine:", error);
-            alert("An error occurred while adding the medicine");
+            errorToast("An error occurred while adding the medicine");
         } finally {
             setIsSubmitting(false);
         }

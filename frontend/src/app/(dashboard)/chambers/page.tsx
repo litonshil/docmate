@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 interface VisitingSlot {
     start_time: string;
@@ -29,6 +30,7 @@ export default function ChambersPage() {
     const router = useRouter();
     const [chambers, setChambers] = useState<Chamber[]>([]);
     const [loading, setLoading] = useState(true);
+    const { success: successToast, error: errorToast } = useToast();
 
     const fetchChambers = useCallback(async () => {
         setLoading(true);
@@ -78,15 +80,15 @@ export default function ChambersPage() {
             });
 
             if (res.ok) {
-                alert('Chamber deleted successfully');
+                successToast('Chamber deleted successfully');
                 fetchChambers();
             } else {
                 const data = await res.json();
-                alert(data.message || 'Failed to delete chamber');
+                errorToast(data.message || 'Failed to delete chamber');
             }
         } catch (error) {
             console.error('Error deleting chamber:', error);
-            alert('An error occurred');
+            errorToast('An error occurred');
         }
     };
 

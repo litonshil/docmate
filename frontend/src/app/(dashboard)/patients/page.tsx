@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 interface Patient {
     id: number;
@@ -19,6 +20,7 @@ export default function PatientList() {
     const router = useRouter();
     const [patients, setPatients] = useState<Patient[]>([]);
     const [loading, setLoading] = useState(true);
+    const { error: errorToast } = useToast();
     const [searchTerm, setSearchTerm] = useState("");
     const [pagination, setPagination] = useState({
         page: 1,
@@ -59,9 +61,11 @@ export default function PatientList() {
                 });
             } else {
                 console.error("Failed to fetch patients:", data.message);
+                errorToast(data.message || "Failed to fetch patients");
             }
         } catch (error) {
             console.error("Error fetching patients:", error);
+            errorToast("An error occurred while fetching patients");
         } finally {
             setLoading(false);
         }

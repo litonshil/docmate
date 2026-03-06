@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useToast } from "@/components/Toast";
 
 export default function LoginPage() {
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const { success: successToast, error: errorToast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,6 +31,7 @@ export default function LoginPage() {
                 // Store token in localStorage
                 if (typeof window !== 'undefined') {
                     localStorage.setItem('docmate_token', data.data.token);
+                    successToast("Logged in successfully!");
 
                     const isProfileCompleted = data.data.user.is_profile_completed;
 
@@ -38,11 +42,11 @@ export default function LoginPage() {
                     }
                 }
             } else {
-                alert(data.message || 'Login failed');
+                errorToast(data.message || 'Login failed');
             }
         } catch (error) {
             console.error('Login error:', error);
-            alert('An error occurred during login. Please ensure the backend is running.');
+            errorToast('An error occurred during login. Please ensure the backend is running.');
         }
     };
 
