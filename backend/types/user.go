@@ -30,15 +30,15 @@ type UserReq struct {
 }
 
 type UserResp struct {
-	ID        int        `json:"id"`
-	UserName  string     `json:"user_name"`
-	Email     string     `json:"email"`
-	Password  string     `json:"-"`
+	ID                 int        `json:"id"`
+	UserName           string     `json:"user_name"`
+	Email              string     `json:"email"`
+	Password           string     `json:"-"`
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          *time.Time `json:"updated_at"`
+	DeletedAt          *time.Time `json:"deleted_at"`
 	Role               string     `json:"role"`
 	IsProfileCompleted bool       `json:"is_profile_completed"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 type LoginReq struct {

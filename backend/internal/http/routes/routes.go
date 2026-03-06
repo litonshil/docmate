@@ -9,11 +9,12 @@ import (
 )
 
 type Routes struct {
-	echo              *echo.Echo
-	userController    *controllers.UserController
-	doctorController  *controllers.DoctorController
-	patientController *controllers.PatientController
-	chamberController *controllers.ChamberController
+	userController     *controllers.UserController
+	doctorController   *controllers.DoctorController
+	patientController  *controllers.PatientController
+	chamberController  *controllers.ChamberController
+	medicineController *controllers.MedicineController
+	echo               *echo.Echo
 }
 
 func New(
@@ -22,13 +23,15 @@ func New(
 	doctorController *controllers.DoctorController,
 	patientController *controllers.PatientController,
 	chamberController *controllers.ChamberController,
+	medicineController *controllers.MedicineController,
 ) *Routes {
 	return &Routes{
-		echo:              e,
-		userController:    userController,
-		doctorController:  doctorController,
-		patientController: patientController,
-		chamberController: chamberController,
+		echo:               e,
+		userController:     userController,
+		doctorController:   doctorController,
+		patientController:  patientController,
+		chamberController:  chamberController,
+		medicineController: medicineController,
 	}
 }
 
@@ -68,5 +71,14 @@ func (r *Routes) Init() {
 		chambers.POST("", r.chamberController.Create)
 		chambers.GET("/:id", r.chamberController.Get)
 		chambers.PUT("/:id", r.chamberController.Update)
+	}
+
+	medicines := v1.Group("/medicines", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	{
+		medicines.GET("", r.medicineController.List)
+		medicines.POST("", r.medicineController.Create)
+		medicines.GET("/:id", r.medicineController.Get)
+		medicines.PUT("/:id", r.medicineController.Update)
+		medicines.DELETE("/:id", r.medicineController.Delete)
 	}
 }
