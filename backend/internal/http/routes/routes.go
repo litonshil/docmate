@@ -4,6 +4,7 @@ import (
 	"docmate/internal/consts"
 	"docmate/internal/http/controllers"
 	"docmate/internal/http/middlewares"
+	"os"
 
 	"github.com/labstack/echo/v4"
 )
@@ -16,6 +17,7 @@ type Routes struct {
 	medicineController     *controllers.MedicineController
 	prescriptionController        *controllers.PrescriptionController
 	prescriptionSettingController *controllers.PrescriptionSettingController
+	uploadController              *controllers.UploadController
 	echo                          *echo.Echo
 }
 
@@ -38,6 +40,7 @@ func New(
 		medicineController:     medicineController,
 		prescriptionController: prescriptionController,
 		prescriptionSettingController: prescriptionSettingController,
+		uploadController:              controllers.NewUploadController(),
 	}
 }
 
@@ -101,4 +104,14 @@ func (r *Routes) Init() {
 		prescriptionSettings.GET("", r.prescriptionSettingController.GetByChamber)
 		prescriptionSettings.POST("", r.prescriptionSettingController.Upsert)
 	}
+
+	// Upload route
+	v1.POST("/upload", r.uploadController.UploadFile, middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+
+	// Static file serving
+	uploadPath := "uploads"
+	if _, err := os.Stat("/project"); err == nil {
+		uploadPath = "/project/uploads"
+	}
+	e.Static("/uploads", uploadPath)
 }
