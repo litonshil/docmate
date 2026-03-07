@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function SettingsPage() {
+    const router = useRouter();
     const [template, setTemplate] = useState('modern');
 
     return (
@@ -39,7 +41,15 @@ export default function SettingsPage() {
 
                 {/* Prescription Template */}
                 <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
-                    <h2 className="text-xl font-bold text-slate-900 mb-6">Prescription Template</h2>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-slate-900">Prescription Template</h2>
+                        <button
+                            onClick={() => router.push('/settings/prescription')}
+                            className="text-sm font-bold text-primary hover:underline"
+                        >
+                            Advanced Settings →
+                        </button>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {[
                             { id: 'classic', name: 'Classic Layout', color: 'bg-slate-100' },

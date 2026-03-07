@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { PrescriptionResp } from '@/types/prescription';
+import { PrescriptionSettingResp } from '@/types/prescription-setting';
 import { useToast } from '@/components/Toast';
 
 // Interfaces for nested relationships
@@ -19,6 +20,7 @@ export default function PrintPrescription() {
     const [patient, setPatient] = useState<Patient | null>(null);
     const [chamber, setChamber] = useState<Chamber | null>(null);
     const [doctor, setDoctor] = useState<Doctor | null>(null);
+    const [settings, setSettings] = useState<PrescriptionSettingResp | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -59,6 +61,13 @@ export default function PrintPrescription() {
             if (docData.success) setDoctor(docData.data);
             if (patData.success) setPatient(patData.data);
             if (chamData.success) setChamber(chamData.data);
+
+            // 2. Fetch Prescription Settings
+            const setRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/v1/doctors/${p.doctor_id}/prescription-settings?chamber_id=${p.chamber_id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const setData = await setRes.json();
+            if (setData.success) setSettings(setData.data);
 
         } catch (error) {
             console.error("Error loading print data:", error);
@@ -105,29 +114,49 @@ export default function PrintPrescription() {
             </div>
 
             {/* Header section matches image */}
-            <div className="flex justify-between items-start border-b-2 border-green-700 pb-4 mb-4">
-                {/* Left Side Doctor Info */}
-                <div className="max-w-[50%]">
-                    <h1 className="text-2xl font-bold text-green-900 mb-1 leading-tight">ডাঃ {doctor.full_name.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1)).join(' ')}</h1>
-                    <p className="text-sm font-semibold">{parseJSONB(doctor.degree, 'MBBS, FCPS')}</p>
-                    <p className="text-[13px]">{parseJSONB(doctor.specialization, 'Medicine Specialist')}</p>
-                    {chamber && (
-                        <div className="mt-2 text-[12px] leading-tight text-gray-700">
-                            <p className="font-semibold text-red-600">Chamber:</p>
-                            <p>{chamber.name}</p>
-                            <p>{chamber.address}</p>
+            <div className={`flex justify-between items-start border-b-2 border-green-700 pb-4 mb-4 ${settings?.template_type === 'modern' ? 'border-blue-600' : ''}`}>
+                {/* Left Side Doctor Info (Bangla/Custom) */}
+                <div className="max-w-[50%] whitespace-pre-wrap">
+                    {settings?.header_left_bangla ? (
+                        <div className="text-[13px] leading-snug">
+                            {settings.header_left_bangla.split('\n').map((line, i) => (
+                                <p key={i} className={i === 0 ? "text-xl font-bold text-green-900 mb-1" : ""}>{line}</p>
+                            ))}
                         </div>
+                    ) : (
+                        <>
+                            <h1 className="text-2xl font-bold text-green-900 mb-1 leading-tight">ডাাঃ {doctor.full_name.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1)).join(' ')}</h1>
+                            <p className="text-sm font-semibold">{parseJSONB(doctor.degree, 'MBBS, FCPS')}</p>
+                            <p className="text-[13px]">{parseJSONB(doctor.specialization, 'Medicine Specialist')}</p>
+                            {chamber && (
+                                <div className="mt-2 text-[12px] leading-tight text-gray-700">
+                                    <p className="font-semibold text-red-600">Chamber:</p>
+                                    <p>{chamber.name}</p>
+                                    <p>{chamber.address}</p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 
                 {/* Right side English Doctor Info */}
-                <div className="text-right max-w-[50%]">
-                    <h1 className="text-xl font-bold uppercase mb-1">DR. {doctor.full_name}</h1>
-                    <p className="text-sm font-medium">{parseJSONB(doctor.degree, 'MBBS')}</p>
-                    <p className="text-[13px] text-red-600 font-bold">{parseJSONB(doctor.specialization, '')}</p>
-                    <p className="text-[12px] leading-tight mt-1">{chamber?.address || ''}</p>
-                    <p className="text-[12px] leading-tight mt-1 font-semibold">{doctor.phone}</p>
-                    <p className="text-[12px] leading-tight">{doctor.email}</p>
+                <div className="text-right max-w-[50%] whitespace-pre-wrap">
+                    {settings?.header_right_english ? (
+                        <div className="text-[13px] leading-snug">
+                            {settings.header_right_english.split('\n').map((line, i) => (
+                                <p key={i} className={i === 0 ? "text-lg font-bold uppercase mb-1" : ""}>{line}</p>
+                            ))}
+                        </div>
+                    ) : (
+                        <>
+                            <h1 className="text-xl font-bold uppercase mb-1">DR. {doctor.full_name}</h1>
+                            <p className="text-sm font-medium">{parseJSONB(doctor.degree, 'MBBS')}</p>
+                            <p className="text-[13px] text-red-600 font-bold">{parseJSONB(doctor.specialization, '')}</p>
+                            <p className="text-[12px] leading-tight mt-1">{chamber?.address || ''}</p>
+                            <p className="text-[12px] leading-tight mt-1 font-semibold">{doctor.phone}</p>
+                            <p className="text-[12px] leading-tight">{doctor.email}</p>
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -238,6 +267,14 @@ export default function PrintPrescription() {
                 <div className="font-custom-signature text-2xl mb-1">{doctor.full_name}</div>
                 <div className="border-t border-black pt-1 px-4 text-xs font-bold uppercase">Signature</div>
             </div>
+
+            {/* Footer Section */}
+            {(settings?.footer_info_bangla || settings?.footer_info_english) && (
+                <div className="absolute bottom-4 left-8 right-8 flex justify-between items-end border-t border-gray-200 pt-2 text-[10px] text-gray-500 italic">
+                    <div className="max-w-[45%] whitespace-pre-wrap">{settings.footer_info_bangla}</div>
+                    <div className="max-w-[45%] text-right whitespace-pre-wrap">{settings.footer_info_english}</div>
+                </div>
+            )}
         </div>
     );
 }

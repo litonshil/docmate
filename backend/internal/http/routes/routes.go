@@ -14,8 +14,9 @@ type Routes struct {
 	patientController  *controllers.PatientController
 	chamberController  *controllers.ChamberController
 	medicineController     *controllers.MedicineController
-	prescriptionController *controllers.PrescriptionController
-	echo                   *echo.Echo
+	prescriptionController        *controllers.PrescriptionController
+	prescriptionSettingController *controllers.PrescriptionSettingController
+	echo                          *echo.Echo
 }
 
 func New(
@@ -26,6 +27,7 @@ func New(
 	chamberController *controllers.ChamberController,
 	medicineController *controllers.MedicineController,
 	prescriptionController *controllers.PrescriptionController,
+	prescriptionSettingController *controllers.PrescriptionSettingController,
 ) *Routes {
 	return &Routes{
 		echo:               e,
@@ -35,6 +37,7 @@ func New(
 		chamberController:      chamberController,
 		medicineController:     medicineController,
 		prescriptionController: prescriptionController,
+		prescriptionSettingController: prescriptionSettingController,
 	}
 }
 
@@ -91,5 +94,11 @@ func (r *Routes) Init() {
 		prescriptions.POST("", r.prescriptionController.Create)
 		prescriptions.GET("/:id", r.prescriptionController.Get)
 		prescriptions.PUT("/:id", r.prescriptionController.Update)
+	}
+
+	prescriptionSettings := v1.Group("/doctors/:doctor_id/prescription-settings", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	{
+		prescriptionSettings.GET("", r.prescriptionSettingController.GetByChamber)
+		prescriptionSettings.POST("", r.prescriptionSettingController.Upsert)
 	}
 }
