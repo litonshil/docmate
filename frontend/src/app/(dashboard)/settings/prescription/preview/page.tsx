@@ -131,7 +131,13 @@ function PreviewContent() {
             </div>
 
             <div className="absolute bottom-12 right-12 text-right">
-                <div className="text-xl font-bold mb-1 opacity-20">[Signature Placeholder]</div>
+                {settings.signature_url ? (
+                    <div className="mb-1">
+                        <img src={settings.signature_url} alt="Doctor Signature" className="h-16 object-contain mix-blend-multiply ml-auto" />
+                    </div>
+                ) : (
+                    <div className="text-xl font-bold mb-1 opacity-20">[Signature Placeholder]</div>
+                )}
                 <div className="border-t border-black pt-1 px-4 text-xs font-bold uppercase">Signature</div>
             </div>
 

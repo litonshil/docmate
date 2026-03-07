@@ -9,7 +9,7 @@ import { useToast } from '@/components/Toast';
 // Interfaces for nested relationships
 interface Patient { full_name: string; date_of_birth: string; gender: string; }
 interface Chamber { name: string; address: string; fee: number; phone: string; }
-interface Doctor { full_name: string; degree: any; specialization: any; phone: string; email: string; }
+interface Doctor { full_name: string; degree: any; specialization: any; phone: string; email: string; signature_url?: string; }
 
 export default function PrintPrescription() {
     const params = useParams();
@@ -264,7 +264,13 @@ export default function PrintPrescription() {
 
             {/* Signature Area */}
             <div className="absolute bottom-12 right-12 text-right">
-                <div className="font-custom-signature text-2xl mb-1">{doctor.full_name}</div>
+                {doctor.signature_url ? (
+                    <div className="mb-1">
+                        <img src={doctor.signature_url} alt="Doctor Signature" className="h-16 object-contain mix-blend-multiply ml-auto" />
+                    </div>
+                ) : (
+                    <div className="font-custom-signature text-2xl mb-1">{doctor.full_name}</div>
+                )}
                 <div className="border-t border-black pt-1 px-4 text-xs font-bold uppercase">Signature</div>
             </div>
 

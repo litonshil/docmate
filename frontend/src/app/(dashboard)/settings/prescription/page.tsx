@@ -242,7 +242,11 @@ export default function PrescriptionSettingsPage() {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                const data = encodeURIComponent(JSON.stringify(formData));
+                                                const previewData = {
+                                                    ...formData,
+                                                    signature_url: doctorProfile?.signature_url || ""
+                                                };
+                                                const data = encodeURIComponent(JSON.stringify(previewData));
                                                 window.open(`/settings/prescription/preview?data=${data}`, '_blank');
                                             }}
                                             className="flex items-center gap-2 text-primary font-bold hover:bg-blue-50 px-6 py-3 rounded-xl transition border border-primary/20"
