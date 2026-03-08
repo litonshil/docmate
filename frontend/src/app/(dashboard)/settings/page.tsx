@@ -8,7 +8,7 @@ import { DoctorResp } from '@/types/doctor';
 export default function SettingsPage() {
     const router = useRouter();
     const { success: successToast, error: errorToast } = useToast();
-    const [template, setTemplate] = useState('modern');
+
     const [profile, setProfile] = useState<DoctorResp | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -234,37 +234,7 @@ export default function SettingsPage() {
                 )}
             </section>
 
-            {/* Prescription Template */}
-            <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-slate-900">Prescription Template</h2>
-                    <button
-                        onClick={() => router.push('/settings/prescription')}
-                        className="text-sm font-bold text-primary hover:underline"
-                    >
-                        Advanced Settings →
-                    </button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                        { id: 'classic', name: 'Classic Layout', color: 'bg-slate-100' },
-                        { id: 'modern', name: 'Modern Minimal', color: 'bg-blue-100' },
-                        { id: 'compact', name: 'Compact Medical', color: 'bg-teal-100' },
-                    ].map((t) => (
-                        <div
-                            key={t.id}
-                            onClick={() => setTemplate(t.id)}
-                            className={`cursor-pointer rounded-2xl border-2 p-4 transition ${template === t.id ? 'border-primary bg-blue-50/30' : 'border-slate-100'}`}
-                        >
-                            <div className={`h-32 rounded-xl mb-4 ${t.color} flex items-center justify-center text-2xl`}>📄</div>
-                            <div className="text-center">
-                                <div className="font-bold text-slate-800 text-sm">{t.name}</div>
-                                {template === t.id && <div className="text-[10px] font-bold text-primary uppercase mt-1">Default Template</div>}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+
         </div>
     );
 }
