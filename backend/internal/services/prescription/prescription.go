@@ -131,9 +131,9 @@ func (svc *service) List(ctx context.Context, req types.PrescriptionListReq) (ty
 	var err error
 
 	if req.PatientID > 0 {
-		records, total, err = svc.repo.ListPrescriptionsByPatient(req.DoctorID, req.PatientID, req.Limit, offset)
+		records, total, err = svc.repo.ListPrescriptionsByPatient(req.DoctorID, req.PatientID, req.Limit, offset, req.Search)
 	} else {
-		records, total, err = svc.repo.ListPrescriptions(req.DoctorID, req.Limit, offset)
+		records, total, err = svc.repo.ListPrescriptions(req.DoctorID, req.Limit, offset, req.Search)
 	}
 
 	if err != nil {
@@ -166,6 +166,7 @@ func (svc *service) mapToResp(p model.Prescription) types.PrescriptionResp {
 		ID:              p.ID,
 		DoctorID:        p.DoctorID,
 		PatientID:       p.PatientID,
+		PatientName:     p.PatientName,
 		ChamberID:       p.ChamberID,
 		Advice:          p.Advice,
 		Status:          p.Status,

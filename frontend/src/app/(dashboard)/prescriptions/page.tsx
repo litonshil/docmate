@@ -8,18 +8,32 @@ import { useToast } from "@/components/Toast";
 export default function PrescriptionList() {
     const [prescriptions, setPrescriptions] = useState<PrescriptionResp[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const { error: errorToast } = useToast();
 
     useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
         fetchPrescriptions();
-    }, []);
+    }, [debouncedSearch]);
 
     const fetchPrescriptions = async () => {
         const token = localStorage.getItem("docmate_token");
         if (!token) return;
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/v1/prescriptions`, {
+            const url = new URL(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081'}/v1/prescriptions`);
+            if (debouncedSearch) {
+                url.searchParams.append("search", debouncedSearch);
+            }
+
+            const response = await fetch(url.toString(), {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -36,7 +50,7 @@ export default function PrescriptionList() {
         }
     };
 
-    if (isLoading) {
+    if (isLoading && !debouncedSearch) {
         return <div className="p-8 text-center text-slate-500">Loading prescriptions...</div>;
     }
 
@@ -51,6 +65,8 @@ export default function PrescriptionList() {
                     <input
                         type="text"
                         placeholder="Search by ID or Patient..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="px-4 py-2.5 w-64 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
                     />
                     <Link href="/prescriptions/new" className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold medical-gradient shadow-lg">
@@ -82,8 +98,8 @@ export default function PrescriptionList() {
                                             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-tighter">Finalized</span>
                                         )}
                                     </div>
-                                    <h3 className="text-lg font-bold text-slate-900">Patient ID: {px.patient_id}</h3>
-                                    <p className="text-sm text-slate-600">Diagnosis: <span className="font-semibold text-primary">{px.diagnosis.join(', ') || 'N/A'}</span> • {px.medications.length} medicines</p>
+                                    <h3 className="text-lg font-bold text-slate-900">{px.patient_name}</h3>
+                                    <p className="text-sm text-slate-600">{px.medications.length} medicines</p>
                                 </div>
                             </div>
 

@@ -38,6 +38,7 @@ export interface PrescriptionResp {
     id: number;
     doctor_id: number;
     patient_id: number;
+    patient_name: string;
     chamber_id: number;
     vitals: Vitals;
     chief_complaints: string[];

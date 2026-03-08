@@ -12,6 +12,7 @@ type Prescription struct {
 	ID              int            `json:"id"`
 	DoctorID        int            `json:"doctor_id"`
 	PatientID       int            `json:"patient_id"`
+	PatientName     string         `json:"patient_name" gorm:"->"`
 	ChamberID       int            `json:"chamber_id"`
 	Vitals          datatypes.JSON `json:"vitals" gorm:"type:jsonb;default:'{}'"`
 	ChiefComplaints datatypes.JSON `json:"chief_complaints" gorm:"type:jsonb;default:'[]'"` 
@@ -38,6 +39,6 @@ type PrescriptionRepo interface {
 	CreatePrescription(p Prescription) (Prescription, error)
 	GetPrescriptionByID(id int) (Prescription, error)
 	UpdatePrescription(p Prescription) (Prescription, error)
-	ListPrescriptions(doctorID int, limit, offset int) ([]Prescription, int, error)
-	ListPrescriptionsByPatient(doctorID, patientID int, limit, offset int) ([]Prescription, int, error)
+	ListPrescriptions(doctorID int, limit, offset int, search string) ([]Prescription, int, error)
+	ListPrescriptionsByPatient(doctorID, patientID int, limit, offset int, search string) ([]Prescription, int, error)
 }

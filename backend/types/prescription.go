@@ -45,6 +45,7 @@ type PrescriptionResp struct {
 	ID              int          `json:"id"`
 	DoctorID        int          `json:"doctor_id"`
 	PatientID       int          `json:"patient_id"`
+	PatientName     string       `json:"patient_name"`
 	ChamberID       int          `json:"chamber_id"`
 	Vitals          Vitals       `json:"vitals"`
 	ChiefComplaints []string     `json:"chief_complaints"`
@@ -63,6 +64,7 @@ type PrescriptionListReq struct {
 	Limit     int `query:"limit"`
 	DoctorID  int // Internal
 	PatientID int `query:"patient_id"`
+	Search    string `query:"search"`
 }
 
 type PaginatedPrescriptionResp struct {
