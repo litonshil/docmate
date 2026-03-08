@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { PrescriptionReq, Vitals, Medication } from '@/types/prescription';
 import MedicineAutocomplete from '@/components/MedicineAutocomplete';
@@ -19,6 +19,7 @@ interface Chamber {
 
 export default function NewPrescription() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { success, error: errorToast } = useToast();
 
     const [patients, setPatients] = useState<Patient[]>([]);
@@ -47,7 +48,11 @@ export default function NewPrescription() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+        const patientId = searchParams.get('patient_id');
+        if (patientId) {
+            setSelectedPatient(Number(patientId));
+        }
+    }, [searchParams]);
 
     const fetchData = async () => {
         const token = localStorage.getItem("docmate_token");
@@ -140,7 +145,7 @@ export default function NewPrescription() {
                 if (status === 'finalized') {
                     router.push(`/prescriptions/${data.data.id}/print`);
                 } else {
-                    router.push('/prescriptions');
+                    router.back();
                 }
             } else {
                 errorToast(data.message || `Failed to ${status} prescription`);
@@ -160,9 +165,12 @@ export default function NewPrescription() {
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Create Prescription</h1>
                     <p className="text-slate-500">Generating digital prescription</p>
                 </div>
-                <Link href="/prescriptions" className="text-sm font-bold text-slate-400 hover:text-slate-900 transition flex items-center gap-1">
-                    ← Back to List
-                </Link>
+                <button
+                    onClick={() => router.back()}
+                    className="text-sm font-bold text-slate-400 hover:text-slate-900 transition flex items-center gap-1"
+                >
+                    ← Back
+                </button>
             </div>
 
             <div className="space-y-8">

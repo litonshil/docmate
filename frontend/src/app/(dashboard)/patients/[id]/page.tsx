@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/Toast";
+import { PrescriptionResp } from "@/types/prescription";
 
 interface Patient {
     id: number;
@@ -23,7 +24,9 @@ export default function PatientDetail({ params: paramsPromise }: { params: Promi
     const router = useRouter();
     const { error: errorToast } = useToast();
     const [patient, setPatient] = useState<Patient | null>(null);
+    const [prescriptions, setPrescriptions] = useState<PrescriptionResp[]>([]);
     const [loading, setLoading] = useState(true);
+    const [fetchingPrescriptions, setFetchingPrescriptions] = useState(false);
 
     useEffect(() => {
         const fetchPatient = async () => {
@@ -36,9 +39,7 @@ export default function PatientDetail({ params: paramsPromise }: { params: Promi
                 }
 
                 const response = await fetch(`http://localhost:8081/v1/patients/${params.id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const data = await response.json();
@@ -56,10 +57,29 @@ export default function PatientDetail({ params: paramsPromise }: { params: Promi
             }
         };
 
+        const fetchPrescriptions = async () => {
+            setFetchingPrescriptions(true);
+            try {
+                const token = localStorage.getItem('docmate_token');
+                const response = await fetch(`http://localhost:8081/v1/prescriptions?patient_id=${params.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    setPrescriptions(data.data.records || []);
+                }
+            } catch (error) {
+                console.error("Error fetching prescriptions:", error);
+            } finally {
+                setFetchingPrescriptions(false);
+            }
+        };
+
         if (params.id) {
             fetchPatient();
+            fetchPrescriptions();
         }
-    }, [params.id, router]);
+    }, [params.id, router, errorToast]);
 
     if (loading) {
         return (
@@ -103,7 +123,12 @@ export default function PatientDetail({ params: paramsPromise }: { params: Promi
                 </div>
                 <div className="flex gap-4">
                     <button className="px-6 py-2.5 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition">Edit Info</button>
-                    <button className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold medical-gradient shadow-lg">+ New Prescription</button>
+                    <Link
+                        href={`/prescriptions/new?patient_id=${patient.id}`}
+                        className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold medical-gradient shadow-lg flex items-center justify-center"
+                    >
+                        + New Prescription
+                    </Link>
                 </div>
             </div>
 
@@ -160,11 +185,54 @@ export default function PatientDetail({ params: paramsPromise }: { params: Promi
                 {/* Right Column: Visit History */}
                 <div className="lg:col-span-2 space-y-8">
                     <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
-                        <h3 className="text-xl font-bold text-slate-900 mb-8">Visit History</h3>
-                        <div className="p-10 text-center border-2 border-dashed border-slate-100 rounded-2xl">
-                            <p className="text-slate-400 font-medium">No visit history available yet.</p>
-                            <button className="text-primary font-bold mt-2 hover:underline">Create first prescription</button>
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-xl font-bold text-slate-900">Visit History</h3>
+                            <Link href={`/prescriptions/new?patient_id=${patient.id}`} className="text-sm font-bold text-primary hover:underline">+ New Visit</Link>
                         </div>
+
+                        {fetchingPrescriptions ? (
+                            <div className="p-10 text-center">
+                                <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                                <p className="text-slate-400">Loading history...</p>
+                            </div>
+                        ) : prescriptions.length > 0 ? (
+                            <div className="space-y-4">
+                                {prescriptions.map((px) => (
+                                    <div key={px.id} className="p-5 rounded-2xl border border-slate-100 hover:border-primary/20 hover:bg-slate-50/50 transition group">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <span className="font-bold text-slate-900">
+                                                        {new Date(px.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    </span>
+                                                    <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase ${px.status === 'finalized' ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
+                                                        {px.status}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-slate-500 line-clamp-1">
+                                                    {px.diagnosis.length > 0 ? px.diagnosis.join(', ') : 'Routine Checkup'}
+                                                </p>
+                                            </div>
+                                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                                                <Link href={`/prescriptions/${px.id}/print`} className="p-2 bg-white border border-slate-200 rounded-lg hover:text-primary transition shadow-sm">
+                                                    🖨️
+                                                </Link>
+                                                <Link href={`/prescriptions/${px.id}/edit`} className="p-2 bg-white border border-slate-200 rounded-lg hover:text-primary transition shadow-sm">
+                                                    📝
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-10 text-center border-2 border-dashed border-slate-100 rounded-2xl">
+                                <p className="text-slate-400 font-medium">No visit history available yet.</p>
+                                <Link href={`/prescriptions/new?patient_id=${patient.id}`} className="text-primary font-bold mt-2 inline-block hover:underline">
+                                    Create first prescription
+                                </Link>
+                            </div>
+                        )}
                     </section>
                 </div>
             </div>

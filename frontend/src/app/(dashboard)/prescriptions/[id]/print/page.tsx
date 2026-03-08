@@ -92,7 +92,7 @@ export default function PrintPrescription() {
         return (
             <div className="flex flex-col h-screen items-center justify-center">
                 <p className="font-bold text-red-500 mb-4">Error generating prescription view.</p>
-                <button onClick={() => router.push('/prescriptions')} className="px-4 py-2 bg-slate-200 rounded-lg">Go Back</button>
+                <button onClick={() => router.back()} className="px-4 py-2 bg-slate-200 rounded-lg">Go Back</button>
             </div>
         );
     }
@@ -109,12 +109,12 @@ export default function PrintPrescription() {
         <div className="print-container bg-white text-black min-h-screen relative p-8 md:p-12 max-w-[210mm] mx-auto overflow-hidden text-sm">
             {/* Action Bar (Hidden when printing) */}
             <div className="no-print absolute top-4 right-4 flex gap-4">
-                <button onClick={() => router.push('/prescriptions')} className="px-4 py-2 border border-slate-300 rounded shadow-sm bg-white hover:bg-slate-50">Back</button>
+                <button onClick={() => router.back()} className="px-4 py-2 border border-slate-300 rounded shadow-sm bg-white hover:bg-slate-50">Back</button>
                 <button onClick={() => window.print()} className="px-4 py-2 bg-blue-600 text-white rounded shadow text-sm font-bold flex items-center gap-2">🖨️ Print PDF</button>
             </div>
 
             {/* Header section matches image */}
-            <div className={`flex justify-between items-start border-b-2 border-green-700 pb-4 mb-4 ${settings?.template_type === 'modern' ? 'border-blue-600' : ''}`}>
+            <div className={`flex justify-between items-start border-b-2 border-green-700 pb-4 mb-4`}>
                 {/* Left Side Doctor Info (Bangla/Custom) */}
                 <div className="max-w-[50%] whitespace-pre-wrap">
                     {settings?.header_left_bangla ? (

@@ -56,7 +56,7 @@ function PreviewContent() {
                 <button onClick={() => window.print()} className="px-4 py-2 bg-blue-600 text-white rounded shadow text-xs font-bold flex items-center gap-2">🖨️ Print Test</button>
             </div>
 
-            <div className={`flex justify-between items-start border-b-2 border-green-700 pb-4 mb-4 ${settings.template_type === 'modern' ? 'border-blue-600' : ''}`}>
+            <div className={`flex justify-between items-start border-b-2 border-green-700 pb-4 mb-4`}>
                 <div className="max-w-[50%] whitespace-pre-wrap">
                     {settings.header_left_bangla ? (
                         <div className="text-[13px] leading-snug">

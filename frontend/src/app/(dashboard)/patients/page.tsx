@@ -146,7 +146,11 @@ export default function PatientList() {
                             </tr>
                         ) : (
                             patients.map((p) => (
-                                <tr key={p.id} className="hover:bg-slate-50/50 transition cursor-pointer">
+                                <tr
+                                    key={p.id}
+                                    onClick={() => router.push(`/patients/${p.id}`)}
+                                    className="hover:bg-slate-50/50 transition cursor-pointer"
+                                >
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-400">
@@ -172,7 +176,7 @@ export default function PatientList() {
                                     <td className="px-8 py-5 text-sm text-slate-500">{formatDate(p.created_at)}</td>
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-3">
-                                            <Link href="/prescriptions/new" className="text-primary font-bold text-sm tracking-tight hover:underline">Prescribe</Link>
+                                            <Link href={`/prescriptions/new?patient_id=${p.id}`} className="text-primary font-bold text-sm tracking-tight hover:underline">Prescribe</Link>
                                             <span className="text-slate-200">|</span>
                                             <Link href={`/patients/${p.id}`} className="text-slate-400 hover:text-slate-900 transition tracking-tight">Profile</Link>
                                         </div>

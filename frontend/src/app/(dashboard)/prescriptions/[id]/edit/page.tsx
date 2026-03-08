@@ -94,7 +94,7 @@ export default function EditPrescription() {
 
                     if (px.status === 'finalized') {
                         errorToast("Finalized prescriptions cannot be edited");
-                        router.push('/prescriptions');
+                        router.back();
                         return;
                     }
 
@@ -173,7 +173,7 @@ export default function EditPrescription() {
                 if (newStatus === 'finalized') {
                     router.push(`/prescriptions/${id}/print`);
                 } else {
-                    router.push('/prescriptions');
+                    router.back();
                 }
             } else {
                 errorToast(data.message || `Failed to ${newStatus} prescription`);
@@ -197,9 +197,12 @@ export default function EditPrescription() {
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Edit Prescription</h1>
                     <p className="text-slate-500">Updating draft prescription</p>
                 </div>
-                <Link href="/prescriptions" className="text-sm font-bold text-slate-400 hover:text-slate-900 transition flex items-center gap-1">
-                    ← Back to List
-                </Link>
+                <button
+                    onClick={() => router.back()}
+                    className="text-sm font-bold text-slate-400 hover:text-slate-900 transition flex items-center gap-1"
+                >
+                    ← Back
+                </button>
             </div>
 
             <div className="space-y-8">

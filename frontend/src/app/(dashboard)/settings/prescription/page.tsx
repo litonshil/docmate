@@ -214,24 +214,7 @@ export default function PrescriptionSettingsPage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4">
-                                    <label className="block text-sm font-bold text-slate-700">Template Selection</label>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {[
-                                            { id: 'standard', name: 'Standard Layout', desc: 'Classic medical prescription style' },
-                                            { id: 'modern', name: 'Modern Minimal', desc: 'Clean and contemporary design' }
-                                        ].map((t) => (
-                                            <div
-                                                key={t.id}
-                                                onClick={() => setFormData({ ...formData, template_type: t.id as any })}
-                                                className={`cursor-pointer rounded-2xl border-2 p-4 transition ${formData.template_type === t.id ? 'border-primary bg-blue-50/30' : 'border-slate-100 hover:border-slate-200'}`}
-                                            >
-                                                <div className="font-bold text-slate-800">{t.name}</div>
-                                                <div className="text-xs text-slate-500 mt-1">{t.desc}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+
 
                                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-slate-100">
                                     <div className="flex items-center gap-4">
