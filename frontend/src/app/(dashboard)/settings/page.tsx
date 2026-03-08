@@ -54,6 +54,7 @@ export default function SettingsPage() {
             }
         } catch (err) {
             console.error("Failed to fetch profile", err);
+            errorToast("Failed to load doctor profile");
         } finally {
             setLoading(false);
         }

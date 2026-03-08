@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 interface Patient {
     id: number;
@@ -20,6 +21,7 @@ interface Patient {
 export default function PatientDetail({ params: paramsPromise }: { params: Promise<{ id: string }> }) {
     const params = use(paramsPromise);
     const router = useRouter();
+    const { error: errorToast } = useToast();
     const [patient, setPatient] = useState<Patient | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -44,9 +46,11 @@ export default function PatientDetail({ params: paramsPromise }: { params: Promi
                     setPatient(data.data);
                 } else {
                     console.error("Failed to fetch patient:", data.message);
+                    errorToast(data.message || "Failed to fetch patient details");
                 }
             } catch (error) {
                 console.error("Error fetching patient:", error);
+                errorToast("An error occurred while loading patient profile");
             } finally {
                 setLoading(false);
             }

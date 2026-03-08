@@ -3,6 +3,7 @@
 import React, { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useToast } from "@/components/Toast";
 
 interface VisitingSlot {
     start_time: string;
@@ -44,6 +45,7 @@ export default function EditChamberPage({ params }: EditChamberPageProps) {
     });
     const [visitingHours, setVisitingHours] = useState<VisitingDay[]>([]);
     const [loading, setLoading] = useState(true);
+    const { success: successToast, error: errorToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -103,6 +105,7 @@ export default function EditChamberPage({ params }: EditChamberPageProps) {
 
                 if (!profileResponse.ok || !profileData.success) {
                     console.error('Error fetching doctor profile');
+                    errorToast('Failed to load doctor profile');
                     return;
                 }
                 const doctor = profileData.data;
@@ -130,11 +133,12 @@ export default function EditChamberPage({ params }: EditChamberPageProps) {
                     });
                     setVisitingHours(c.visiting_hours || []);
                 } else {
-                    alert('Chamber not found');
+                    errorToast('Chamber not found');
                     router.push('/chambers');
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
+                errorToast('Failed to load chamber details');
             } finally {
                 setLoading(false);
             }
@@ -148,7 +152,7 @@ export default function EditChamberPage({ params }: EditChamberPageProps) {
         if (!doctorProfile) return;
 
         if (visitingHours.length === 0) {
-            alert('Please select at least one day for your schedule.');
+            errorToast('Please select at least one day for your schedule.');
             return;
         }
 
@@ -180,14 +184,14 @@ export default function EditChamberPage({ params }: EditChamberPageProps) {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                alert('Chamber updated successfully!');
+                successToast('Chamber updated successfully!');
                 router.push('/chambers');
             } else {
-                alert(data.message || 'Failed to update chamber');
+                errorToast(data.message || 'Failed to update chamber');
             }
         } catch (error) {
             console.error('Error updating chamber:', error);
-            alert('An error occurred while saving chamber information.');
+            errorToast('An error occurred while saving chamber information.');
         } finally {
             setIsSubmitting(false);
         }

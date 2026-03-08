@@ -51,6 +51,7 @@ export default function MedicinesPage() {
             }
         } catch (error) {
             console.error("Error fetching medicines:", error);
+            errorToast("Failed to fetch medicines");
         } finally {
             setLoading(false);
         }

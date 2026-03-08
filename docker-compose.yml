@@ -7,6 +7,8 @@ services:
       - "8500:8500"
     networks:
       - docmate_networks
+    volumes:
+      - docmate_consul:/consul/data:rw
 
   db:
     container_name: docmate_postgres
@@ -93,3 +95,5 @@ volumes:
     name: docmate-db-data
   docmate_cache:
     name: docmate-cache-data
+  docmate_consul:
+    name: docmate-consul-data

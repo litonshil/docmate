@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useToast } from "@/components/Toast";
 
 interface VisitingSlot {
     start_time: string;
@@ -29,6 +30,7 @@ export default function NewChamberPage() {
         follow_up_fee: '',
     });
     const [visitingHours, setVisitingHours] = useState<VisitingDay[]>([]);
+    const { success: successToast, error: errorToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -86,6 +88,7 @@ export default function NewChamberPage() {
                 }
             } catch (error) {
                 console.error('Error fetching doctor profile:', error);
+                errorToast('Failed to load doctor profile');
             }
         };
         fetchProfile();
@@ -94,12 +97,12 @@ export default function NewChamberPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!doctorProfile) {
-            alert('Doctor profile not loaded. Please try again.');
+            errorToast('Doctor profile not loaded. Please try again.');
             return;
         }
 
         if (visitingHours.length === 0) {
-            alert('Please select at least one day for your schedule.');
+            errorToast('Please select at least one day for your schedule.');
             return;
         }
 
@@ -129,14 +132,14 @@ export default function NewChamberPage() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                alert('Chamber registered successfully!');
+                successToast('Chamber registered successfully!');
                 router.push('/chambers');
             } else {
-                alert(data.message || 'Failed to register chamber');
+                errorToast(data.message || 'Failed to register chamber');
             }
         } catch (error) {
             console.error('Error creating chamber:', error);
-            alert('An error occurred while saving chamber information.');
+            errorToast('An error occurred while saving chamber information.');
         } finally {
             setIsSubmitting(false);
         }

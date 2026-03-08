@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useToast } from "@/components/Toast";
 
 export default function NewPatientPage() {
     const router = useRouter();
@@ -13,6 +14,7 @@ export default function NewPatientPage() {
         gender: 'male',
         blood_group: 'A+',
     });
+    const { success: successToast, error: errorToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +23,7 @@ export default function NewPatientPage() {
 
         const token = localStorage.getItem('docmate_token');
         if (!token) {
-            alert('Unauthorized: Please log in again.');
+            errorToast('Unauthorized: Please log in again.');
             router.push('/login');
             return;
         }
@@ -45,14 +47,14 @@ export default function NewPatientPage() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                alert('Patient created successfully!');
+                successToast('Patient created successfully!');
                 router.push('/patients');
             } else {
-                alert(data.message || 'Failed to create patient');
+                errorToast(data.message || 'Failed to create patient');
             }
         } catch (error) {
             console.error('Error creating patient:', error);
-            alert('An error occurred while saving patient information.');
+            errorToast('An error occurred while saving patient information.');
         } finally {
             setIsSubmitting(false);
         }

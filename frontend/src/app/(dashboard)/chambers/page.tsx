@@ -58,6 +58,7 @@ export default function ChambersPage() {
             }
         } catch (error) {
             console.error("Error fetching chambers:", error);
+            errorToast("Failed to fetch chambers");
         } finally {
             setLoading(false);
         }

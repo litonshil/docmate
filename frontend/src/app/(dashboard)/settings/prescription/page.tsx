@@ -97,6 +97,7 @@ export default function PrescriptionSettingsPage() {
             }
         } catch (error) {
             console.error("Error fetching settings:", error);
+            errorToast("Failed to fetch prescription settings");
         }
     }, [doctorProfile]);
 
