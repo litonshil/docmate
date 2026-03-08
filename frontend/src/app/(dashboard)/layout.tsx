@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
 export default function DashboardLayout({
@@ -10,6 +10,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
+    const pathname = usePathname();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -26,6 +27,29 @@ export default function DashboardLayout({
         localStorage.removeItem('docmate_token');
         router.push('/login');
     };
+
+    const navItems = [
+        { name: 'Dashboard', icon: '🏠', href: '/' },
+        { name: 'Patients', icon: '👤', href: '/patients' },
+        { name: 'Prescriptions', icon: '📋', href: '/prescriptions' },
+        { name: 'Medicines', icon: '💊', href: '/medicines' },
+        { name: 'Chambers', icon: '🏥', href: '/chambers' },
+    ];
+
+    const settingsItems = [
+        { name: 'Profile', href: '/settings' },
+        { name: 'Prescription', href: '/settings/prescription' },
+    ];
+
+    const isSettingsActive = pathname.startsWith('/settings');
+    const [isSettingsOpen, setIsSettingsOpen] = useState(isSettingsActive);
+
+    // Update isSettingsOpen when pathname changes to ensure it's open when active
+    useEffect(() => {
+        if (isSettingsActive) {
+            setIsSettingsOpen(true);
+        }
+    }, [isSettingsActive]);
 
     if (isLoading) {
         return (
@@ -49,24 +73,59 @@ export default function DashboardLayout({
                     <span className="text-xl font-extrabold text-slate-900 tracking-tight">Doc-Mate</span>
                 </div>
 
-                <nav className="flex-1 p-4 space-y-2 mt-4">
-                    {[
-                        { name: 'Dashboard', icon: '🏠', href: '/' },
-                        { name: 'Patients', icon: '👤', href: '/patients' },
-                        { name: 'Prescriptions', icon: '📋', href: '/prescriptions' },
-                        { name: 'Medicines', icon: '💊', href: '/medicines' },
-                        { name: 'Chambers', icon: '🏥', href: '/chambers' },
-                        { name: 'Settings', icon: '⚙️', href: '/settings' },
-                    ].map((item) => (
+                <nav className="flex-1 p-4 space-y-1 mt-4 overflow-y-auto">
+                    {navItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-primary transition font-medium"
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${pathname === item.href
+                                ? 'bg-slate-50 text-primary'
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-primary'
+                                }`}
                         >
                             <span>{item.icon}</span>
                             {item.name}
                         </Link>
                     ))}
+
+                    <div className="space-y-1">
+                        <button
+                            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-medium transition ${isSettingsActive ? 'text-primary' : 'text-slate-600'
+                                } hover:bg-slate-50`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <span>⚙️</span>
+                                Settings
+                            </div>
+                            <svg
+                                className={`w-4 h-4 transition-transform duration-200 ${isSettingsOpen ? 'rotate-180' : ''}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        {isSettingsOpen && (
+                            <div className="pl-11 space-y-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                                {settingsItems.map((child) => (
+                                    <Link
+                                        key={child.href}
+                                        href={child.href}
+                                        className={`block py-2 text-sm transition font-medium ${pathname === child.href
+                                            ? 'text-primary'
+                                            : 'text-slate-400 hover:text-primary'
+                                            }`}
+                                    >
+                                        {child.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </nav>
 
                 <div className="p-6 border-t border-border mt-auto">

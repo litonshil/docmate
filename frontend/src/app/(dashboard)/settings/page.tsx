@@ -129,149 +129,142 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="p-8 max-w-4xl">
-            <div className="mb-10">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Account Settings</h1>
-                <p className="text-slate-500">Configure your profile and prescription preferences</p>
-            </div>
-
-            <div className="space-y-10">
-                {/* Profile Card */}
-                <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
-                    <h2 className="text-xl font-bold text-slate-900 mb-6">Doctor Profile</h2>
-                    {loading ? (
-                        <div className="flex justify-center py-10">
-                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleProfileSubmit}>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
-                                        value={doctorForm.full_name}
-                                        onChange={(e) => setDoctorForm({ ...doctorForm, full_name: e.target.value })}
-                                        placeholder="Dr. Faisal Ahmed"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Degrees (comma separated)</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
-                                        value={doctorForm.degree}
-                                        onChange={(e) => setDoctorForm({ ...doctorForm, degree: e.target.value })}
-                                        placeholder="MBBS, FCPS"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Specialization</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
-                                        value={doctorForm.specialization}
-                                        onChange={(e) => setDoctorForm({ ...doctorForm, specialization: e.target.value })}
-                                        placeholder="Medicine Specialist"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Phone</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
-                                        value={doctorForm.phone}
-                                        onChange={(e) => setDoctorForm({ ...doctorForm, phone: e.target.value })}
-                                        placeholder="+880..."
-                                    />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Bio</label>
-                                    <textarea
-                                        className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition h-24"
-                                        value={doctorForm.bio}
-                                        onChange={(e) => setDoctorForm({ ...doctorForm, bio: e.target.value })}
-                                        placeholder="Professional bio..."
-                                    ></textarea>
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Signature</label>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handleSignatureUpload}
-                                    />
-                                    <div
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className={`border-2 border-dashed rounded-2xl p-6 text-center transition group cursor-pointer ${doctorForm.signature_url ? 'border-primary bg-blue-50/50' : 'border-slate-200 hover:border-primary'}`}
-                                    >
-                                        {uploading ? (
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
-                                                <span className="text-sm font-bold text-primary italic underline">Uploading signature...</span>
-                                            </div>
-                                        ) : doctorForm.signature_url ? (
-                                            <div className="flex flex-col items-center gap-2">
-                                                <img src={doctorForm.signature_url} alt="Signature Preview" className="h-16 object-contain mix-blend-multiply" />
-                                                <span className="text-xs font-bold text-primary italic underline">Click to change signature</span>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-slate-400 group-hover:text-primary mb-1">Click to upload signature image</span>
-                                                <span className="text-[10px] text-slate-300">PNG, JPG recommended</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+        <div className="space-y-10">
+            {/* Profile Card */}
+            <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
+                <h2 className="text-xl font-bold text-slate-900 mb-6">Doctor Profile</h2>
+                {loading ? (
+                    <div className="flex justify-center py-10">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                ) : (
+                    <form onSubmit={handleProfileSubmit}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Full Name</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
+                                    value={doctorForm.full_name}
+                                    onChange={(e) => setDoctorForm({ ...doctorForm, full_name: e.target.value })}
+                                    placeholder="Dr. Faisal Ahmed"
+                                />
                             </div>
-                            <div className="mt-8 flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={saving}
-                                    className="bg-primary text-white px-8 py-2.5 rounded-xl font-bold medical-gradient shadow-lg hover:opacity-90 transition disabled:opacity-50"
+                            <div>
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Degrees (comma separated)</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
+                                    value={doctorForm.degree}
+                                    onChange={(e) => setDoctorForm({ ...doctorForm, degree: e.target.value })}
+                                    placeholder="MBBS, FCPS"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Specialization</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
+                                    value={doctorForm.specialization}
+                                    onChange={(e) => setDoctorForm({ ...doctorForm, specialization: e.target.value })}
+                                    placeholder="Medicine Specialist"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Phone</label>
+                                <input
+                                    type="text"
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition"
+                                    value={doctorForm.phone}
+                                    onChange={(e) => setDoctorForm({ ...doctorForm, phone: e.target.value })}
+                                    placeholder="+880..."
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Bio</label>
+                                <textarea
+                                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition h-24"
+                                    value={doctorForm.bio}
+                                    onChange={(e) => setDoctorForm({ ...doctorForm, bio: e.target.value })}
+                                    placeholder="Professional bio..."
+                                ></textarea>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Signature</label>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept="image/*"
+                                    onChange={handleSignatureUpload}
+                                />
+                                <div
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`border-2 border-dashed rounded-2xl p-6 text-center transition group cursor-pointer ${doctorForm.signature_url ? 'border-primary bg-blue-50/50' : 'border-slate-200 hover:border-primary'}`}
                                 >
-                                    {saving ? "Saving..." : "Save Profile"}
-                                </button>
-                            </div>
-                        </form>
-                    )}
-                </section>
-
-                {/* Prescription Template */}
-                <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-slate-900">Prescription Template</h2>
-                        <button
-                            onClick={() => router.push('/settings/prescription')}
-                            className="text-sm font-bold text-primary hover:underline"
-                        >
-                            Advanced Settings →
-                        </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {[
-                            { id: 'classic', name: 'Classic Layout', color: 'bg-slate-100' },
-                            { id: 'modern', name: 'Modern Minimal', color: 'bg-blue-100' },
-                            { id: 'compact', name: 'Compact Medical', color: 'bg-teal-100' },
-                        ].map((t) => (
-                            <div
-                                key={t.id}
-                                onClick={() => setTemplate(t.id)}
-                                className={`cursor-pointer rounded-2xl border-2 p-4 transition ${template === t.id ? 'border-primary bg-blue-50/30' : 'border-slate-100'}`}
-                            >
-                                <div className={`h-32 rounded-xl mb-4 ${t.color} flex items-center justify-center text-2xl`}>📄</div>
-                                <div className="text-center">
-                                    <div className="font-bold text-slate-800 text-sm">{t.name}</div>
-                                    {template === t.id && <div className="text-[10px] font-bold text-primary uppercase mt-1">Default Template</div>}
+                                    {uploading ? (
+                                        <div className="flex flex-col items-center">
+                                            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+                                            <span className="text-sm font-bold text-primary italic underline">Uploading signature...</span>
+                                        </div>
+                                    ) : doctorForm.signature_url ? (
+                                        <div className="flex flex-col items-center gap-2">
+                                            <img src={doctorForm.signature_url} alt="Signature Preview" className="h-16 object-contain mix-blend-multiply" />
+                                            <span className="text-xs font-bold text-primary italic underline">Click to change signature</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center">
+                                            <span className="text-slate-400 group-hover:text-primary mb-1">Click to upload signature image</span>
+                                            <span className="text-[10px] text-slate-300">PNG, JPG recommended</span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </section>
-            </div>
+                        </div>
+                        <div className="mt-8 flex justify-end">
+                            <button
+                                type="submit"
+                                disabled={saving}
+                                className="bg-primary text-white px-8 py-2.5 rounded-xl font-bold medical-gradient shadow-lg hover:opacity-90 transition disabled:opacity-50"
+                            >
+                                {saving ? "Saving..." : "Save Profile"}
+                            </button>
+                        </div>
+                    </form>
+                )}
+            </section>
+
+            {/* Prescription Template */}
+            <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold text-slate-900">Prescription Template</h2>
+                    <button
+                        onClick={() => router.push('/settings/prescription')}
+                        className="text-sm font-bold text-primary hover:underline"
+                    >
+                        Advanced Settings →
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                        { id: 'classic', name: 'Classic Layout', color: 'bg-slate-100' },
+                        { id: 'modern', name: 'Modern Minimal', color: 'bg-blue-100' },
+                        { id: 'compact', name: 'Compact Medical', color: 'bg-teal-100' },
+                    ].map((t) => (
+                        <div
+                            key={t.id}
+                            onClick={() => setTemplate(t.id)}
+                            className={`cursor-pointer rounded-2xl border-2 p-4 transition ${template === t.id ? 'border-primary bg-blue-50/30' : 'border-slate-100'}`}
+                        >
+                            <div className={`h-32 rounded-xl mb-4 ${t.color} flex items-center justify-center text-2xl`}>📄</div>
+                            <div className="text-center">
+                                <div className="font-bold text-slate-800 text-sm">{t.name}</div>
+                                {template === t.id && <div className="text-[10px] font-bold text-primary uppercase mt-1">Default Template</div>}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
         </div>
     );
 }

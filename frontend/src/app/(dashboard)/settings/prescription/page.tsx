@@ -148,12 +148,7 @@ export default function PrescriptionSettingsPage() {
     }
 
     return (
-        <div className="p-8 max-w-4xl mx-auto">
-            <div className="mb-10">
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Prescription Template Settings</h1>
-                <p className="text-slate-500">Configure chamber-wise headers and footers for your prescriptions</p>
-            </div>
-
+        <div className="mx-auto">
             <div className="grid grid-cols-1 gap-8">
                 <section className="bg-card rounded-3xl border border-border shadow-sm p-8">
                     <form onSubmit={handleSave} className="space-y-8">
