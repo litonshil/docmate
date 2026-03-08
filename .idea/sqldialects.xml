@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/migrations/000001_users.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000001_users.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000002_doctors.down.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000002_doctors.up.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/000006_prescriptions.up.sql" dialect="GenericSQL" />
+  </component>
+</project>

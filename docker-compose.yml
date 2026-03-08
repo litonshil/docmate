@@ -7,8 +7,6 @@ services:
       - "8500:8500"
     networks:
       - docmate_networks
-    volumes:
-      - docmate_consul:/consul/data:rw
 
   db:
     container_name: docmate_postgres
@@ -37,17 +35,16 @@ services:
     networks:
       - docmate_networks
 
-  backend:
-    container_name: docmate_backend
-    image: docmate_backend
+  docmate:
+    container_name: docmate
+    image: docmate
     build:
-      context: ./backend
-      network: host
+      context: .
     ports:
       - "8081:8080"
     command: serve  # make `serve` into `seed` or `seed --truncate=true` if anyone want to run the seeder
     volumes:
-      - ./backend:/project
+      - ./:/project
     environment:
       - CONSUL_URL=http://docmate_consul:8500
       - CONSUL_PATH=docmate
@@ -65,26 +62,6 @@ services:
         max_attempts: 3
         window: 120s
 
-  frontend:
-    container_name: docmate_frontend
-    build:
-      context: ./frontend
-      network: host
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules  # this prevents local ./frontend from overwriting container's built node_modules
-      - /app/.next         # anonymous volume for next build cache
-    environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8081
-    depends_on:
-      - backend
-    networks:
-      - docmate_networks
-    tty: true
-    stdin_open: true
-
 networks:
   docmate_networks:
     name: docmate_networks
@@ -95,5 +72,3 @@ volumes:
     name: docmate-db-data
   docmate_cache:
     name: docmate-cache-data
-  docmate_consul:
-    name: docmate-consul-data
