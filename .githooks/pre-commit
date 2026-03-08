@@ -1,73 +1,81 @@
-# #!/bin/bash
+#!/bin/sh
 
-# printf "\n---------------Running git pre-commit hook---------------\n"
-
-# ## this will retrieve all of the .go files that have been
-# ## changed since the last commit
-# STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '.go$')
-
-# ## we can check to see if this is empty
-# if [[ $STAGED_GO_FILES == "" ]]; then
-#     printf "No Go Files to Update!\n"
-# else
-#     for FILE in $STAGED_GO_FILES; do
-#         go fmt "$FILE"
-#         "$(go env GOPATH)"/bin/goimports -w "$FILE"
-#     done
-
-#     "$(go env GOPATH)"/bin/golangci-lint run
-#     if [[ $? != 0 ]]; then
-#         printf "\nCommit failed! Please fix errors before committing.\n"
-#         exit 1
-#     fi
-
-#     for FILE in $STAGED_GO_FILES; do
-#         git add "$FILE"
-#     done
-# fi
-
-
-# printf "\n---------------Git pre-commit hook end---------------\n"
-
-
-#!/bin/bash
+# This script runs during git commit to format and lint Go files.
+# It handles the backend directory specifically.
 
 printf "\n---------------Running git pre-commit hook---------------\n"
 
-# 1. Retrieve all .go files staged for commit from the root
-# This will now include the 'backend/' prefix in the file paths
-STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '.go$')
+# 1. Path Discovery - try to find go if not in PATH
+if ! command -v go >/dev/null 2>&1; then
+    for dir in "/usr/local/go/bin" "/usr/lib/go/bin" "$HOME/go/bin" "$HOME/sdk/go*/bin" "$HOME/.local/bin"; do
+        # Use a subshell to expand the wildcard and take the first match
+        found_dir=$(ls -d $dir 2>/dev/null | head -n 1)
+        if [ -d "$found_dir" ] && [ -x "$found_dir/go" ]; then
+            export PATH="$PATH:$found_dir"
+            break
+        fi
+    done
+fi
 
-if [[ $STAGED_GO_FILES == "" ]]; then
+# 2. Check for Go
+if ! command -v go >/dev/null 2>&1; then
+    printf "Error: 'go' command not found. Please ensure Go is installed and in your PATH.\n"
+    exit 1
+fi
+
+# Add GOPATH/bin to PATH
+GOPATH_BIN=$(go env GOPATH 2>/dev/null)/bin
+if [ -n "$GOPATH_BIN" ]; then
+    export PATH="$PATH:$GOPATH_BIN"
+fi
+
+# 3. Get staged files
+STAGED_GO_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.go$')
+
+if [ -z "$STAGED_GO_FILES" ]; then
     printf "No Go Files to Update!\n"
-else
-    # Get GOPATH once to avoid repeated calls in the loop
-    GOPATH=$(go env GOPATH)
+    printf "\n---------------Git pre-commit hook end---------------\n"
+    exit 0
+fi
 
-    for FILE in $STAGED_GO_FILES; do
-        # Format the file
+# 4. Format and Imports
+# We use 'command -v' to check if the tool exists before running it
+for FILE in $STAGED_GO_FILES; do
+    if [ -f "$FILE" ]; then
+        printf "Formatting $FILE...\n"
         go fmt "$FILE"
         
-        # Run goimports
-        # Added a check to ensure goimports exists to prevent script failure
-        if [ -f "$GOPATH/bin/goimports" ]; then
-            "$GOPATH/bin/goimports" -w "$FILE"
-        else
-            printf "Warning: goimports not found at $GOPATH/bin/goimports\n"
+        if command -v goimports >/dev/null 2>&1; then
+            goimports -w "$FILE"
         fi
         
-        # Re-stage the formatted file
         git add "$FILE"
-    done
+    fi
+done
 
-    # 2. Run golangci-lint
-    # We run this from the root; golangci-lint usually finds the 
-    # nested go.mod in the backend folder automatically.
-    printf "Running golangci-lint...\n"
-    "$GOPATH"/bin/golangci-lint run ./backend/...
+# 5. Linting - Only run if backend files are changed
+# Check if any staged file starts with 'backend/'
+BACKEND_CHANGED=0
+for FILE in $STAGED_GO_FILES; do
+    case "$FILE" in
+        backend/*) BACKEND_CHANGED=1; break ;;
+    esac
+done
 
-    if [[ $? != 0 ]]; then
-        printf "\nCommit failed! Please fix errors before committing.\n"
-        exit 1
+if [ "$BACKEND_CHANGED" -eq 1 ]; then
+    printf "Running golangci-lint in backend folder...\n"
+    if [ -d "backend" ]; then
+        if command -v golangci-lint >/dev/null 2>&1; then
+            # We run it from the root but target the backend package
+            golangci-lint run ./backend/...
+            if [ $? -ne 0 ]; then
+                printf "\nCommit failed! Please fix errors before committing.\n"
+                exit 1
+            fi
+        else
+            printf "Warning: 'golangci-lint' not found. Skipping lint check...\n"
+        fi
     fi
 fi
+
+printf "\n---------------Git pre-commit hook end---------------\n"
