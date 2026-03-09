@@ -1,3 +1,5 @@
+name: docmate
+
 services:
   consul:
     image: consul:1.14.5
