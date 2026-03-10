@@ -23,6 +23,7 @@ func RegisterSubCommand(cmd *cobra.Command) {
 func Execute() error {
 	RegisterServeCommand()
 	RegisterMigrateCommand()
+	RegisterSeedCommand()
 
 	if err := config.Load(); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
