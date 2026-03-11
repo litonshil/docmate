@@ -37,8 +37,11 @@ func (repo *Repository) ListMedicines(offset, limit int, search string) ([]model
 	db := repo.client.Model(&model.Medicine{})
 
 	if search != "" {
-		searchQuery := fmt.Sprintf("%%%s%%", search)
+		searchQuery := fmt.Sprintf("%s%%", search)
 		db = db.Where("brand_name ILIKE ? OR generic_name ILIKE ?", searchQuery, searchQuery)
+		db = db.Order("brand_name ASC")
+	} else {
+		db = db.Order("brand_name ASC")
 	}
 
 	if err := db.Count(&total).Error; err != nil {
