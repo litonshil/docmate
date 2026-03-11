@@ -19,6 +19,7 @@ type Routes struct {
 	prescriptionController        *controllers.PrescriptionController
 	prescriptionSettingController *controllers.PrescriptionSettingController
 	uploadController              *controllers.UploadController
+	dashboardController           *controllers.DashboardController
 }
 
 func New(
@@ -30,6 +31,7 @@ func New(
 	medicineController *controllers.MedicineController,
 	prescriptionController *controllers.PrescriptionController,
 	prescriptionSettingController *controllers.PrescriptionSettingController,
+	dashboardController *controllers.DashboardController,
 ) *Routes {
 	return &Routes{
 		echo:                          e,
@@ -41,6 +43,7 @@ func New(
 		prescriptionController:        prescriptionController,
 		prescriptionSettingController: prescriptionSettingController,
 		uploadController:              controllers.NewUploadController(),
+		dashboardController:           dashboardController,
 	}
 }
 
@@ -103,6 +106,11 @@ func (r *Routes) Init() {
 	{
 		prescriptionSettings.GET("", r.prescriptionSettingController.GetByChamber)
 		prescriptionSettings.POST("", r.prescriptionSettingController.Upsert)
+	}
+
+	dashboard := v1.Group("/dashboard", middlewares.AuthRoles(consts.RoleDoctor))
+	{
+		dashboard.GET("/summary", r.dashboardController.GetSummary)
 	}
 
 	// Upload route

@@ -7,8 +7,10 @@ import (
 	"docmate/internal/http/middlewares"
 	httpRoutes "docmate/internal/http/routes"
 	httpServer "docmate/internal/http/server"
+	dashboardrepo "docmate/internal/repositories/dashboard"
 	"docmate/internal/repositories/db"
 	chamberservice "docmate/internal/services/chamber"
+	dashboardservice "docmate/internal/services/dashboard"
 	doctorservice "docmate/internal/services/doctor"
 	medicineservice "docmate/internal/services/medicine"
 	patientservice "docmate/internal/services/patient"
@@ -51,6 +53,9 @@ func MountRoutes(ctx context.Context, e *echo.Echo) {
 	prescriptionsvc := prescriptionservice.NewService(dbRepo)
 	prescriptionsettingsvc := prescriptionsettingservice.NewService(dbRepo)
 
+	dashrepo := dashboardrepo.NewDashboardRepo(dbClient)
+	dashboardsvc := dashboardservice.NewDashboardService(dashrepo)
+
 	_ = txsvc
 
 	userController := controllers.NewUserController(ctx, usersvc)
@@ -60,8 +65,9 @@ func MountRoutes(ctx context.Context, e *echo.Echo) {
 	medicineController := controllers.NewMedicineController(ctx, medicinesvc)
 	prescriptionController := controllers.NewPrescriptionController(ctx, prescriptionsvc, dbRepo)
 	prescriptionSettingController := controllers.NewPrescriptionSettingController(prescriptionsettingsvc, dbRepo)
+	dashboardController := controllers.NewDashboardController(ctx, dashboardsvc, dbRepo)
 
-	routes := httpRoutes.New(e, userController, doctorController, patientController, chamberController, medicineController, prescriptionController, prescriptionSettingController)
+	routes := httpRoutes.New(e, userController, doctorController, patientController, chamberController, medicineController, prescriptionController, prescriptionSettingController, dashboardController)
 	routes.Init()
 }
 
