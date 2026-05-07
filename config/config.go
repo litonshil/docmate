@@ -245,7 +245,7 @@ func setDefaultConfig() {
 		Db: &DBConfig{
 			Host:        "127.0.0.1",
 			Name:        "docmate",
-			Port:        5432,
+			Port:        5433,
 			Username:    "docmate_user",
 			Password:    "12345678",
 			MaxLifeTime: 30,
