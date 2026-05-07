@@ -11,8 +11,8 @@ type PrescriptionSettingReq struct {
 	ChamberID          int    `json:"chamber_id"`
 	HeaderLeftBangla   string `json:"header_left_bangla"`
 	HeaderRightEnglish string `json:"header_right_english"`
-	FooterInfoBangla   string `json:"footer_info_bangla"`
-	FooterInfoEnglish  string `json:"footer_info_english"`
+	ChamberInfo        string `json:"chamber_info"`
+	VisitingHour       string `json:"visiting_hour"`
 	TemplateType       string `json:"template_type"`
 }
 
@@ -30,8 +30,8 @@ type PrescriptionSettingResp struct {
 	ChamberID          int       `json:"chamber_id"`
 	HeaderLeftBangla   string    `json:"header_left_bangla"`
 	HeaderRightEnglish string    `json:"header_right_english"`
-	FooterInfoBangla   string    `json:"footer_info_bangla"`
-	FooterInfoEnglish  string    `json:"footer_info_english"`
+	ChamberInfo        string    `json:"chamber_info"`
+	VisitingHour       string    `json:"visiting_hour"`
 	TemplateType       string    `json:"template_type"`
 	CreatedAt          time.Time `json:"created_at"`
 	UpdatedAt          time.Time `json:"updated_at"`

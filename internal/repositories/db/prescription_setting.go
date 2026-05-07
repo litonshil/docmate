@@ -10,7 +10,7 @@ func (repo *Repository) Upsert(setting model.PrescriptionSetting) (model.Prescri
 	err := repo.client.Model(&model.PrescriptionSetting{}).
 		Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "doctor_id"}, {Name: "chamber_id"}},
-			DoUpdates: clause.AssignmentColumns([]string{"header_left_bangla", "header_right_english", "footer_info_bangla", "footer_info_english", "template_type", "updated_at"}),
+			DoUpdates: clause.AssignmentColumns([]string{"header_left_bangla", "header_right_english", "chamber_info", "visiting_hour", "template_type", "updated_at"}),
 		}).Create(&setting).Error
 
 	return setting, err

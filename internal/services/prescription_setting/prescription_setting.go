@@ -23,8 +23,8 @@ func (s *Service) Upsert(ctx context.Context, req types.PrescriptionSettingReq) 
 		ChamberID:          req.ChamberID,
 		HeaderLeftBangla:   req.HeaderLeftBangla,
 		HeaderRightEnglish: req.HeaderRightEnglish,
-		FooterInfoBangla:   req.FooterInfoBangla,
-		FooterInfoEnglish:  req.FooterInfoEnglish,
+		ChamberInfo:        req.ChamberInfo,
+		VisitingHour:       req.VisitingHour,
 		TemplateType:       req.TemplateType,
 	}
 
@@ -56,8 +56,8 @@ func mapToResponse(setting model.PrescriptionSetting) types.PrescriptionSettingR
 		ChamberID:          setting.ChamberID,
 		HeaderLeftBangla:   setting.HeaderLeftBangla,
 		HeaderRightEnglish: setting.HeaderRightEnglish,
-		FooterInfoBangla:   setting.FooterInfoBangla,
-		FooterInfoEnglish:  setting.FooterInfoEnglish,
+		ChamberInfo:        setting.ChamberInfo,
+		VisitingHour:       setting.VisitingHour,
 		TemplateType:       setting.TemplateType,
 		CreatedAt:          setting.CreatedAt,
 		UpdatedAt:          setting.UpdatedAt,
