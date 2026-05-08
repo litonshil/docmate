@@ -33,5 +33,9 @@
       "database": 4,
       "mandatoryPrefix": "docmate_"
     }
+  },
+  "ai": {
+    "geminiApiKey": "",
+    "provider": "gemini"
   }
 }

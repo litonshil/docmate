@@ -22,6 +22,7 @@ type Config struct {
 	Db    *DbClient
 	Cache *CacheClient
 	Queue *QueueClient
+	AI    *AIConfig
 }
 
 // AppConfig application specific config.
@@ -97,6 +98,11 @@ type AsynqConfig struct {
 	TaskExecTimeUnit string
 }
 
+type AIConfig struct {
+	GeminiAPIKey string
+	Provider     string
+}
+
 // Get returns all configurations.
 func Get() Config {
 	return c
@@ -116,6 +122,10 @@ func Cache() *CacheClient {
 
 func Queue() *QueueClient {
 	return c.Queue
+}
+
+func AI() *AIConfig {
+	return c.AI
 }
 
 // Load the config.
@@ -279,5 +289,10 @@ func setDefaultConfig() {
 			UniquenessTTL:    1,
 			TaskExecTimeUnit: "SECOND",
 		},
+	}
+
+	c.AI = &AIConfig{
+		GeminiAPIKey: "",
+		Provider:     "gemini",
 	}
 }

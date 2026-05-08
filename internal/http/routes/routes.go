@@ -20,6 +20,7 @@ type Routes struct {
 	prescriptionSettingController *controllers.PrescriptionSettingController
 	uploadController              *controllers.UploadController
 	dashboardController           *controllers.DashboardController
+	aiSettingController           *controllers.AISuggestionController
 }
 
 func New(
@@ -32,6 +33,7 @@ func New(
 	prescriptionController *controllers.PrescriptionController,
 	prescriptionSettingController *controllers.PrescriptionSettingController,
 	dashboardController *controllers.DashboardController,
+	aiSettingController *controllers.AISuggestionController,
 ) *Routes {
 	return &Routes{
 		echo:                          e,
@@ -44,6 +46,7 @@ func New(
 		prescriptionSettingController: prescriptionSettingController,
 		uploadController:              controllers.NewUploadController(),
 		dashboardController:           dashboardController,
+		aiSettingController:           aiSettingController,
 	}
 }
 
@@ -67,6 +70,7 @@ func (r *Routes) Init() {
 		doctors.POST("", r.doctorController.Create)
 		doctors.GET("/:id", r.doctorController.Get)
 		doctors.PUT("/:id", r.doctorController.Update)
+		doctors.PATCH("/:id/ai-settings", r.aiSettingController.AdminUpdateSettings, middlewares.AuthRoles(consts.RoleAdmin))
 	}
 
 	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleDoctor))
@@ -111,6 +115,17 @@ func (r *Routes) Init() {
 	dashboard := v1.Group("/dashboard", middlewares.AuthRoles(consts.RoleDoctor))
 	{
 		dashboard.GET("/summary", r.dashboardController.GetSummary)
+	}
+
+	aiSuggestions := v1.Group("/suggestions", middlewares.AuthRoles(consts.RoleDoctor))
+	{
+		aiSuggestions.POST("", r.aiSettingController.GetSuggestions)
+	}
+
+	aiSettings := v1.Group("/settings/ai", middlewares.AuthRoles(consts.RoleDoctor))
+	{
+		aiSettings.GET("", r.aiSettingController.GetSettings)
+		aiSettings.POST("", r.aiSettingController.UpsertSettings)
 	}
 
 	// Upload route
