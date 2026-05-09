@@ -1,6 +1,7 @@
 package types
 
 import (
+	"regexp"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -23,9 +24,9 @@ func (req PatientReq) Validate() error {
 		validation.Field(&req.FullName, validation.Required, validation.Length(2, 150)),
 		validation.Field(&req.Gender, validation.Required, validation.In("male", "female", "other")),
 		validation.Field(&req.Age, validation.Required, validation.Min(0), validation.Max(150)),
-		validation.Field(&req.Phone, validation.Length(5, 20)),
+		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^\d{11}$`)).Error("phone must be exactly 11 digits")),
 		validation.Field(&req.Email, is.Email),
-		validation.Field(&req.BloodGroup, validation.In("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")),
+		validation.Field(&req.BloodGroup, validation.In("", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")),
 	)
 }
 
@@ -44,12 +45,12 @@ type PatientUpdateReq struct {
 func (req PatientUpdateReq) Validate() error {
 	return validation.ValidateStruct(&req,
 		validation.Field(&req.ID, validation.Required),
-		validation.Field(&req.FullName, validation.Length(2, 150)),
-		validation.Field(&req.Gender, validation.In("male", "female", "other")),
-		validation.Field(&req.Age, validation.Min(0), validation.Max(150)),
-		validation.Field(&req.Phone, validation.Length(5, 20)),
+		validation.Field(&req.FullName, validation.Required, validation.Length(2, 150)),
+		validation.Field(&req.Gender, validation.Required, validation.In("male", "female", "other")),
+		validation.Field(&req.Age, validation.Required, validation.Min(0), validation.Max(150)),
+		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^\d{11}$`)).Error("phone must be exactly 11 digits")),
 		validation.Field(&req.Email, is.Email),
-		validation.Field(&req.BloodGroup, validation.In("A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")),
+		validation.Field(&req.BloodGroup, validation.In("", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")),
 	)
 }
 
@@ -65,8 +66,7 @@ func (f PatientFilter) Validate() error {
 
 type PatientListReq struct {
 	Pagination
-	Name  string `json:"name" query:"name"`
-	Phone string `json:"phone" query:"phone"`
+	Search string `json:"search" query:"search"`
 }
 
 type PatientResp struct {

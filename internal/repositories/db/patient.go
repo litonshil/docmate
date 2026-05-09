@@ -26,7 +26,7 @@ func (r *Repository) GetPatientByID(id int) (model.Patient, error) {
 	return patient, nil
 }
 
-func (r *Repository) ListPatients(offset, limit, doctorID int, name, phone string) ([]model.Patient, int64, error) {
+func (r *Repository) ListPatients(offset, limit, doctorID int, search string) ([]model.Patient, int64, error) {
 	var patients []model.Patient
 	var total int64
 
@@ -36,12 +36,9 @@ func (r *Repository) ListPatients(offset, limit, doctorID int, name, phone strin
 		query = query.Where("doctor_id = ?", doctorID)
 	}
 
-	if name != "" {
-		query = query.Where("full_name ILIKE ?", "%"+name+"%")
-	}
-
-	if phone != "" {
-		query = query.Where("phone ILIKE ?", "%"+phone+"%")
+	if search != "" {
+		searchTerm := "%" + search + "%"
+		query = query.Where("full_name ILIKE ? OR phone ILIKE ?", searchTerm, searchTerm)
 	}
 
 	if err := query.Count(&total).Error; err != nil {

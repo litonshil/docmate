@@ -90,7 +90,7 @@ func (service *Service) Get(ctx context.Context, filter types.PatientFilter) (ty
 
 func (service *Service) List(ctx context.Context, req types.PatientListReq, doctorID int) (types.PaginatedResponse[types.PatientResp], error) {
 	offset := (req.Page - 1) * req.Limit
-	patients, total, err := service.patientRepo.ListPatients(offset, req.Limit, doctorID, req.Name, req.Phone)
+	patients, total, err := service.patientRepo.ListPatients(offset, req.Limit, doctorID, req.Search)
 	if err != nil {
 		slog.Error("failed to list patients", "error", err.Error())
 

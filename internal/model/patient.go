@@ -33,5 +33,5 @@ type PatientRepo interface {
 	CreatePatient(patient Patient) (Patient, error)
 	UpdatePatient(patient Patient) (Patient, error)
 	GetPatientByID(id int) (Patient, error)
-	ListPatients(offset, limit, doctorID int, name, phone string) ([]Patient, int64, error)
+	ListPatients(offset, limit, doctorID int, search string) ([]Patient, int64, error)
 }
