@@ -30,10 +30,23 @@ func (r *appointmentRepo) UpdateAppointment(appointment *model.Appointment) erro
 	return r.db.Save(appointment).Error
 }
 
-func (r *appointmentRepo) ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, page, limit int) ([]model.Appointment, int64, error) {
+func (r *appointmentRepo) ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]model.Appointment, int64, error) {
 	var appointments []model.Appointment
 	var total int64
 	query := r.db.Model(&model.Appointment{}).Where("doctor_id = ?", doctorID)
+
+	if search != "" {
+		var patientIDs []int
+		searchPattern := "%" + search + "%"
+		r.db.Model(&model.Patient{}).
+			Where("doctor_id = ? AND (full_name ILIKE ? OR phone ILIKE ?)", doctorID, searchPattern, searchPattern).
+			Pluck("id", &patientIDs)
+
+		if len(patientIDs) == 0 {
+			return []model.Appointment{}, 0, nil
+		}
+		query = query.Where("patient_id IN ?", patientIDs)
+	}
 
 	if dateFrom != nil {
 		query = query.Where("appointment_date >= ?", dateFrom)
@@ -50,10 +63,23 @@ func (r *appointmentRepo) ListAppointments(doctorID int, dateFrom, dateTo *time.
 	}
 
 	offset := (page - 1) * limit
-	err := query.Preload("Patient").Preload("Chamber").
-		Order("appointment_date asc, start_time asc").
-		Offset(offset).Limit(limit).
-		Find(&appointments).Error
+	q := r.db.Model(&model.Appointment{}).
+		Joins("JOIN patients ON patients.id = appointments.patient_id").
+		Where("appointments.doctor_id = ?", doctorID).
+		Preload("Patient").Preload("Chamber")
+
+	if search != "" {
+		searchPattern := "%" + search + "%"
+		q = q.Where("(patients.full_name ILIKE ? OR patients.phone LIKE ?)", searchPattern, searchPattern)
+	}
+
+	if status == "pending" {
+		q = q.Order("appointments.appointment_date asc, appointments.start_time asc")
+	} else {
+		q = q.Order("appointments.created_at desc")
+	}
+
+	err := q.Offset(offset).Limit(limit).Find(&appointments).Error
 
 	return appointments, total, err
 }

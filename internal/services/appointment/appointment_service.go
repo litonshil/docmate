@@ -21,9 +21,26 @@ func NewAppointmentService(repo model.AppointmentRepo) model.AppointmentUseCase 
 }
 
 func (s *appointmentService) BookAppointment(ctx context.Context, req types.AppointmentReq, doctorID int) (types.AppointmentResp, error) {
+	if err := req.Validate(); err != nil {
+		return types.AppointmentResp{}, err
+	}
+
 	date, err := time.Parse("2006-01-02", req.AppointmentDate)
 	if err != nil {
 		return types.AppointmentResp{}, fmt.Errorf("invalid date format: %w", err)
+	}
+
+	// Time validation: Ensure appointment is in the future
+	// StartTime format: "10:30 AM"
+	timeStr := req.StartTime
+	t, err := time.Parse("03:04 PM", timeStr)
+	if err != nil {
+		return types.AppointmentResp{}, fmt.Errorf("invalid time format: %w", err)
+	}
+
+	appointmentTime := time.Date(date.Year(), date.Month(), date.Day(), t.Hour(), t.Minute(), 0, 0, time.Local)
+	if appointmentTime.Before(time.Now().Add(-1 * time.Minute)) { // Allow 1 min grace for network lag
+		return types.AppointmentResp{}, errors.New("appointment time must be in the future")
 	}
 
 	appointment := &model.Appointment{
@@ -101,7 +118,7 @@ func (s *appointmentService) GetAppointment(ctx context.Context, id int) (types.
 	return mapToAppointmentResponse(*app), nil
 }
 
-func (s *appointmentService) ListAppointments(ctx context.Context, doctorID int, dateFromStr, dateToStr string, status string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error) {
+func (s *appointmentService) ListAppointments(ctx context.Context, doctorID int, dateFromStr, dateToStr string, status string, search string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error) {
 	var dateFrom, dateTo *time.Time
 
 	if page <= 0 {
@@ -125,7 +142,7 @@ func (s *appointmentService) ListAppointments(ctx context.Context, doctorID int,
 		}
 	}
 
-	appointments, total, err := s.repo.ListAppointments(doctorID, dateFrom, dateTo, status, page, limit)
+	appointments, total, err := s.repo.ListAppointments(doctorID, dateFrom, dateTo, status, search, page, limit)
 	if err != nil {
 		slog.Error("failed to list appointments", "doctor_id", doctorID, "error", err.Error())
 

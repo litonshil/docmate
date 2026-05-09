@@ -62,6 +62,7 @@ func (ctrl *AppointmentController) List(c echo.Context) error {
 	dateFrom := c.QueryParam("date_from")
 	dateTo := c.QueryParam("date_to")
 	status := c.QueryParam("status")
+	search := c.QueryParam("search")
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	limit, _ := strconv.Atoi(c.QueryParam("limit"))
 
@@ -72,7 +73,7 @@ func (ctrl *AppointmentController) List(c echo.Context) error {
 		limit = 10
 	}
 
-	paginatedResp, err := ctrl.svc.ListAppointments(ctx, doctor.ID, dateFrom, dateTo, status, page, limit)
+	paginatedResp, err := ctrl.svc.ListAppointments(ctx, doctor.ID, dateFrom, dateTo, status, search, page, limit)
 	if err != nil {
 		return response.InternalServerError(c, "Failed to list appointments")
 	}

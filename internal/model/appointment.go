@@ -42,7 +42,7 @@ type AppointmentRepo interface {
 	CreateAppointment(appointment *Appointment) error
 	GetAppointmentByID(id int) (*Appointment, error)
 	UpdateAppointment(appointment *Appointment) error
-	ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, page, limit int) ([]Appointment, int64, error)
+	ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]Appointment, int64, error)
 	GetTodayAppointments(doctorID int) ([]Appointment, error)
 }
 
@@ -50,5 +50,5 @@ type AppointmentUseCase interface {
 	BookAppointment(ctx context.Context, req types.AppointmentReq, doctorID int) (types.AppointmentResp, error)
 	UpdateStatus(ctx context.Context, id int, status AppointmentStatus) error
 	GetAppointment(ctx context.Context, id int) (types.AppointmentResp, error)
-	ListAppointments(ctx context.Context, doctorID int, dateFrom, dateTo string, status string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error)
+	ListAppointments(ctx context.Context, doctorID int, dateFrom, dateTo string, status string, search string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error)
 }
