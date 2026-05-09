@@ -27,14 +27,14 @@ type DoctorUseCase interface {
 	Create(ctx context.Context, req types.DoctorReq) (types.DoctorResp, error)
 	Get(ctx context.Context, filter types.DoctorFilter) (types.DoctorResp, error)
 	Update(ctx context.Context, req types.DoctorUpdateReq) (types.DoctorResp, error)
-	List(ctx context.Context, req types.DoctorListReq) (types.PaginatedDoctorResp, error)
+	List(ctx context.Context, req types.DoctorListReq) (types.PaginatedResponse[types.DoctorResp], error)
 }
 
 type DoctorRepo interface {
 	CreateDoctor(doctor Doctor) (Doctor, error)
 	UpdateDoctor(doctor Doctor) (Doctor, error)
 	GetDoctorByID(id int) (Doctor, error)
-	ListDoctors(offset, limit int) ([]Doctor, int, error)
+	ListDoctors(offset, limit int) ([]Doctor, int64, error)
 
 	GetDoctorByUserID(userID int) (Doctor, error)
 	UpsertDoctor(doctor Doctor) (Doctor, error)

@@ -78,18 +78,6 @@ func (ur UserReq) Validate() error {
 	)
 }
 
-type Pagination struct {
-	Page     int `json:"page" query:"page"`
-	Limit    int `json:"limit" query:"limit"`
-	Total    int `json:"total"`
-	LastPage int `json:"last_page"`
-}
-
 type UserListReq struct {
 	Pagination
-}
-
-type PaginatedResponse struct {
-	Pagination
-	Records []UserResp `json:"records"`
 }

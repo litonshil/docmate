@@ -4,33 +4,33 @@ import (
 	"docmate/internal/model"
 )
 
-func (repo *Repository) CreatePatient(patient model.Patient) (model.Patient, error) {
-	err := repo.client.Create(&patient).Error
+func (r *Repository) CreatePatient(patient model.Patient) (model.Patient, error) {
+	err := r.client.Create(&patient).Error
 
 	return patient, err
 }
 
-func (repo *Repository) UpdatePatient(patient model.Patient) (model.Patient, error) {
+func (r *Repository) UpdatePatient(patient model.Patient) (model.Patient, error) {
 	// Omit CreatedAt and let GORM handle UpdatedAt automatically
-	err := repo.client.Model(&model.Patient{}).Where("id = ?", patient.ID).Omit("created_at").Updates(&patient).Error
+	err := r.client.Model(&model.Patient{}).Where("id = ?", patient.ID).Omit("created_at").Updates(&patient).Error
 
 	return patient, err
 }
 
-func (repo *Repository) GetPatientByID(id int) (model.Patient, error) {
+func (r *Repository) GetPatientByID(id int) (model.Patient, error) {
 	var patient model.Patient
-	if err := repo.dbClient(nil).Model(&model.Patient{}).Where("id = ?", id).First(&patient).Error; err != nil {
+	if err := r.dbClient(nil).Model(&model.Patient{}).Where("id = ?", id).First(&patient).Error; err != nil {
 		return model.Patient{}, err
 	}
 
 	return patient, nil
 }
 
-func (repo *Repository) ListPatients(offset, limit, doctorID int, name, phone string) ([]model.Patient, int, error) {
+func (r *Repository) ListPatients(offset, limit, doctorID int, name, phone string) ([]model.Patient, int64, error) {
 	var patients []model.Patient
 	var total int64
 
-	query := repo.client.Model(&model.Patient{})
+	query := r.client.Model(&model.Patient{})
 
 	if doctorID > 0 {
 		query = query.Where("doctor_id = ?", doctorID)
@@ -52,5 +52,5 @@ func (repo *Repository) ListPatients(offset, limit, doctorID int, name, phone st
 		return nil, 0, err
 	}
 
-	return patients, int(total), nil
+	return patients, total, nil
 }

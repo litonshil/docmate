@@ -46,7 +46,7 @@ type MedicineUseCase interface {
 	Get(ctx context.Context, id int) (types.MedicineResp, error)
 	Update(ctx context.Context, req types.MedicineUpdateReq) (types.MedicineResp, error)
 	Delete(ctx context.Context, id int) error
-	List(ctx context.Context, req types.MedicineListReq) (types.PaginatedMedicineResp, error)
+	List(ctx context.Context, req types.MedicineListReq) (types.PaginatedResponse[types.MedicineResp], error)
 }
 
 type MedicineRepo interface {
@@ -54,5 +54,5 @@ type MedicineRepo interface {
 	UpdateMedicine(medicine Medicine) (Medicine, error)
 	GetMedicineByID(id int) (Medicine, error)
 	DeleteMedicine(id int) error
-	ListMedicines(offset, limit int, search string) ([]Medicine, int, error)
+	ListMedicines(offset, limit int, search string) ([]Medicine, int64, error)
 }

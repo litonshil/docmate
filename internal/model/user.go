@@ -24,7 +24,7 @@ type User struct {
 type UserUseCase interface {
 	Create(ctx context.Context, req types.UserReq) (types.UserResp, error)
 	Get(ctx context.Context, userID int) (types.UserResp, error)
-	List(ctx context.Context, req types.UserListReq) (types.PaginatedResponse, error)
+	List(ctx context.Context, req types.UserListReq) (types.PaginatedResponse[types.UserResp], error)
 	Login(ctx context.Context, req types.LoginReq) (types.LoginResp, error)
 }
 
@@ -32,5 +32,5 @@ type UserRepo interface {
 	Create(req User) (User, error)
 	Get(userID int) (User, error)
 	GetByEmail(email string) (User, error)
-	List(offset, limit int) ([]User, int, error)
+	List(offset, limit int) ([]User, int64, error)
 }

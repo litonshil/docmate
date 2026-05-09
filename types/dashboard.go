@@ -18,9 +18,11 @@ type PatientSummary struct {
 }
 
 type ScheduleSummary struct {
-	PrescriptionID int    `json:"prescription_id"`
+	ID             int    `json:"id"`
+	PrescriptionID int    `json:"prescription_id,omitempty"`
 	PatientID      int    `json:"patient_id"`
 	PatientName    string `json:"patient_name"`
-	Time           string `json:"time"` // Example: "09:00 AM"
-	Type           string `json:"type"` // Example: "Checkup", "Follow-up"
+	Time           string `json:"time"`   // Example: "09:00 AM"
+	Type           string `json:"type"`   // Example: "Checkup", "Follow-up"
+	Status         string `json:"status"` // pending, confirmed, etc.
 }

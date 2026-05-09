@@ -75,34 +75,30 @@ func (r *dashboardRepo) GetRecentPatients(ctx context.Context, doctorID int, lim
 }
 
 func (r *dashboardRepo) GetTodaySchedule(ctx context.Context, doctorID int) ([]types.ScheduleSummary, error) {
-	var prescriptions []model.Prescription
+	var appointments []model.Appointment
 	today := time.Now().Truncate(24 * time.Hour)
 	tomorrow := today.Add(24 * time.Hour)
 
-	// Fetch prescriptions where today is the FollowUpDate OR created today
 	err := r.db.WithContext(ctx).
-		Where("doctor_id = ? AND ((follow_up_date >= ? AND follow_up_date < ?) OR (created_at >= ? AND created_at < ?))",
-			doctorID, today, tomorrow, today, tomorrow).
-		Order("created_at asc").
-		Find(&prescriptions).Error
+		Preload("Patient").
+		Where("doctor_id = ? AND appointment_date >= ? AND appointment_date < ? AND status != ?",
+			doctorID, today, tomorrow, model.AppointmentStatusCancelled).
+		Order("start_time asc").
+		Find(&appointments).Error
 
 	if err != nil {
 		return nil, err
 	}
 
 	var summaries []types.ScheduleSummary
-	for _, p := range prescriptions {
-		typ := "Checkup"
-		if p.FollowUpDate != nil && p.FollowUpDate.After(today) && p.FollowUpDate.Before(tomorrow) {
-			typ = "Follow-up"
-		}
-
+	for _, app := range appointments {
 		summaries = append(summaries, types.ScheduleSummary{
-			PrescriptionID: p.ID,
-			PatientID:      p.PatientID,
-			PatientName:    p.PatientName,
-			Time:           p.CreatedAt.Format("03:04 PM"),
-			Type:           typ,
+			ID:          app.ID,
+			PatientID:   app.PatientID,
+			PatientName: app.Patient.FullName,
+			Time:        app.StartTime,
+			Type:        app.Reason,
+			Status:      string(app.Status),
 		})
 	}
 

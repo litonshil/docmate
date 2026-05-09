@@ -123,11 +123,11 @@ func (svc *service) Get(ctx context.Context, id int, doctorID int) (types.Prescr
 	return svc.mapToResp(p), nil
 }
 
-func (svc *service) List(ctx context.Context, req types.PrescriptionListReq) (types.PaginatedPrescriptionResp, error) {
+func (svc *service) List(ctx context.Context, req types.PrescriptionListReq) (types.PaginatedResponse[types.PrescriptionResp], error) {
 	offset := (req.Page - 1) * req.Limit
 
 	var records []model.Prescription
-	var total int
+	var total int64
 	var err error
 
 	if req.PatientID > 0 {
@@ -137,7 +137,7 @@ func (svc *service) List(ctx context.Context, req types.PrescriptionListReq) (ty
 	}
 
 	if err != nil {
-		return types.PaginatedPrescriptionResp{}, err
+		return types.PaginatedResponse[types.PrescriptionResp]{}, err
 	}
 
 	resps := make([]types.PrescriptionResp, 0, len(records))
@@ -145,12 +145,9 @@ func (svc *service) List(ctx context.Context, req types.PrescriptionListReq) (ty
 		resps = append(resps, svc.mapToResp(rec))
 	}
 
-	lastPage := total / req.Limit
-	if total%req.Limit != 0 {
-		lastPage++
-	}
+	lastPage := (int(total) + req.Limit - 1) / req.Limit
 
-	return types.PaginatedPrescriptionResp{
+	return types.PaginatedResponse[types.PrescriptionResp]{
 		Pagination: types.Pagination{
 			Page:     req.Page,
 			Limit:    req.Limit,

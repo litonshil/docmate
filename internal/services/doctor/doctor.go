@@ -101,13 +101,13 @@ func (service *Service) Get(ctx context.Context, filter types.DoctorFilter) (typ
 	return mapToDoctorResponse(doctor), nil
 }
 
-func (service *Service) List(ctx context.Context, req types.DoctorListReq) (types.PaginatedDoctorResp, error) {
+func (service *Service) List(ctx context.Context, req types.DoctorListReq) (types.PaginatedResponse[types.DoctorResp], error) {
 	offset := (req.Page - 1) * req.Limit
 	doctors, total, err := service.doctorRepo.ListDoctors(offset, req.Limit)
 	if err != nil {
 		slog.Error("failed to list doctors list", "error", err.Error())
 
-		return types.PaginatedDoctorResp{}, err
+		return types.PaginatedResponse[types.DoctorResp]{}, err
 	}
 
 	var records []types.DoctorResp
@@ -115,12 +115,9 @@ func (service *Service) List(ctx context.Context, req types.DoctorListReq) (type
 		records = append(records, mapToDoctorResponse(doctor))
 	}
 
-	lastPage := total / req.Limit
-	if total%req.Limit > 0 {
-		lastPage++
-	}
+	lastPage := (int(total) + req.Limit - 1) / req.Limit
 
-	return types.PaginatedDoctorResp{
+	return types.PaginatedResponse[types.DoctorResp]{
 		Pagination: types.Pagination{
 			Page:     req.Page,
 			Limit:    req.Limit,

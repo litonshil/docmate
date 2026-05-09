@@ -64,7 +64,7 @@ func (service *Service) Get(ctx context.Context, userID int) (types.UserResp, er
 	return resp, nil
 }
 
-func (service *Service) List(ctx context.Context, req types.UserListReq) (types.PaginatedResponse, error) {
+func (service *Service) List(ctx context.Context, req types.UserListReq) (types.PaginatedResponse[types.UserResp], error) {
 	if req.Page == 0 || req.Limit == 0 {
 		req.Page = consts.Page
 		req.Limit = consts.Limit
@@ -76,7 +76,7 @@ func (service *Service) List(ctx context.Context, req types.UserListReq) (types.
 	if err != nil {
 		slog.Error("failed to list users", "error", err)
 
-		return types.PaginatedResponse{}, fmt.Errorf("failed to list users: %w", err)
+		return types.PaginatedResponse[types.UserResp]{}, fmt.Errorf("failed to list users: %w", err)
 	}
 
 	userResp := make([]types.UserResp, len(users))
@@ -85,9 +85,9 @@ func (service *Service) List(ctx context.Context, req types.UserListReq) (types.
 		userResp[i] = mapToUserResponse(user, doc.ID != 0)
 	}
 
-	lastPage := (total + req.Limit - 1) / req.Limit
+	lastPage := (int(total) + req.Limit - 1) / req.Limit
 
-	resp := types.PaginatedResponse{
+	resp := types.PaginatedResponse[types.UserResp]{
 		Pagination: types.Pagination{
 			Page:     req.Page,
 			Limit:    req.Limit,

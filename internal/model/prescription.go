@@ -32,13 +32,13 @@ type PrescriptionUseCase interface {
 	Create(ctx context.Context, req types.PrescriptionReq) (types.PrescriptionResp, error)
 	Get(ctx context.Context, id int, doctorID int) (types.PrescriptionResp, error)
 	Update(ctx context.Context, id int, req types.PrescriptionReq) (types.PrescriptionResp, error)
-	List(ctx context.Context, req types.PrescriptionListReq) (types.PaginatedPrescriptionResp, error)
+	List(ctx context.Context, req types.PrescriptionListReq) (types.PaginatedResponse[types.PrescriptionResp], error)
 }
 
 type PrescriptionRepo interface {
 	CreatePrescription(p Prescription) (Prescription, error)
 	GetPrescriptionByID(id int) (Prescription, error)
 	UpdatePrescription(p Prescription) (Prescription, error)
-	ListPrescriptions(doctorID int, limit, offset int, search string) ([]Prescription, int, error)
-	ListPrescriptionsByPatient(doctorID, patientID int, limit, offset int, search string) ([]Prescription, int, error)
+	ListPrescriptions(doctorID int, limit, offset int, search string) ([]Prescription, int64, error)
+	ListPrescriptionsByPatient(doctorID, patientID int, limit, offset int, search string) ([]Prescription, int64, error)
 }

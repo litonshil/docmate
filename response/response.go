@@ -34,6 +34,11 @@ func Success(c echo.Context, message string, data interface{}) error {
 	return JSON(c, http.StatusOK, true, message, data, nil)
 }
 
+// Created sends a 201 Created response.
+func Created(c echo.Context, message string, data interface{}) error {
+	return JSON(c, http.StatusCreated, true, message, data, nil)
+}
+
 // Error sends an error response.
 func Error(c echo.Context, statusCode int, message string, errs interface{}) error {
 	return JSON(c, statusCode, false, message, nil, errs)

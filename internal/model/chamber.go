@@ -31,12 +31,12 @@ type ChamberUseCase interface {
 	Create(ctx context.Context, req types.ChamberReq) (types.ChamberResp, error)
 	Get(ctx context.Context, filter types.ChamberFilter) (types.ChamberResp, error)
 	Update(ctx context.Context, req types.ChamberUpdateReq) (types.ChamberResp, error)
-	List(ctx context.Context, req types.ChamberListReq) (types.PaginatedChamberResp, error)
+	List(ctx context.Context, req types.ChamberListReq) (types.PaginatedResponse[types.ChamberResp], error)
 }
 
 type ChamberRepo interface {
 	CreateChamber(chamber Chamber) (Chamber, error)
 	UpdateChamber(chamber Chamber) (Chamber, error)
 	GetChamberByID(id int) (Chamber, error)
-	ListChambers(offset, limit, doctorID int) ([]Chamber, int, error)
+	ListChambers(offset, limit, doctorID int) ([]Chamber, int64, error)
 }

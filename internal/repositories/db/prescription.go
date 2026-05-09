@@ -4,21 +4,21 @@ import (
 	"docmate/internal/model"
 )
 
-func (repo *Repository) CreatePrescription(p model.Prescription) (model.Prescription, error) {
-	err := repo.client.Create(&p).Error
+func (r *Repository) CreatePrescription(p model.Prescription) (model.Prescription, error) {
+	err := r.client.Create(&p).Error
 
 	return p, err
 }
 
-func (repo *Repository) UpdatePrescription(p model.Prescription) (model.Prescription, error) {
-	err := repo.client.Save(&p).Error
+func (r *Repository) UpdatePrescription(p model.Prescription) (model.Prescription, error) {
+	err := r.client.Save(&p).Error
 
 	return p, err
 }
 
-func (repo *Repository) GetPrescriptionByID(id int) (model.Prescription, error) {
+func (r *Repository) GetPrescriptionByID(id int) (model.Prescription, error) {
 	var p model.Prescription
-	err := repo.client.Table("prescriptions").
+	err := r.client.Table("prescriptions").
 		Select("prescriptions.*, patients.full_name as patient_name").
 		Joins("left join patients on patients.id = prescriptions.patient_id").
 		Where("prescriptions.id = ?", id).
@@ -27,11 +27,11 @@ func (repo *Repository) GetPrescriptionByID(id int) (model.Prescription, error) 
 	return p, err
 }
 
-func (repo *Repository) ListPrescriptions(doctorID int, limit, offset int, search string) ([]model.Prescription, int, error) {
+func (r *Repository) ListPrescriptions(doctorID int, limit, offset int, search string) ([]model.Prescription, int64, error) {
 	var prescriptions []model.Prescription
 	var count int64
 
-	query := repo.client.Table("prescriptions").
+	query := r.client.Table("prescriptions").
 		Select("prescriptions.*, patients.full_name as patient_name").
 		Joins("left join patients on patients.id = prescriptions.patient_id").
 		Where("prescriptions.doctor_id = ?", doctorID)
@@ -51,7 +51,7 @@ func (repo *Repository) ListPrescriptions(doctorID int, limit, offset int, searc
 
 	err = query.Order("prescriptions.created_at desc").Limit(limit).Offset(offset).Scan(&prescriptions).Error
 
-	return prescriptions, int(count), err
+	return prescriptions, count, err
 }
 
 func extractID(s string) string {
@@ -62,11 +62,11 @@ func extractID(s string) string {
 	return ""
 }
 
-func (repo *Repository) ListPrescriptionsByPatient(doctorID, patientID int, limit, offset int, search string) ([]model.Prescription, int, error) {
+func (r *Repository) ListPrescriptionsByPatient(doctorID, patientID int, limit, offset int, search string) ([]model.Prescription, int64, error) {
 	var prescriptions []model.Prescription
 	var count int64
 
-	query := repo.client.Table("prescriptions").
+	query := r.client.Table("prescriptions").
 		Select("prescriptions.*, patients.full_name as patient_name").
 		Joins("left join patients on patients.id = prescriptions.patient_id").
 		Where("prescriptions.doctor_id = ? AND prescriptions.patient_id = ?", doctorID, patientID)
@@ -86,5 +86,5 @@ func (repo *Repository) ListPrescriptionsByPatient(doctorID, patientID int, limi
 
 	err = query.Order("prescriptions.created_at desc").Limit(limit).Offset(offset).Scan(&prescriptions).Error
 
-	return prescriptions, int(count), err
+	return prescriptions, count, err
 }

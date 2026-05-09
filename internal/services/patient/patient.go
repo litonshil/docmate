@@ -26,9 +26,12 @@ func (service *Service) Create(ctx context.Context, req types.PatientReq, doctor
 		Age:            req.Age,
 		Phone:          req.Phone,
 		Email:          req.Email,
-		BloodGroup:     req.BloodGroup,
 		Allergies:      req.Allergies,
 		MedicalHistory: req.MedicalHistory,
+	}
+
+	if req.BloodGroup != "" {
+		payload.BloodGroup = &req.BloodGroup
 	}
 
 	patient, err := service.patientRepo.CreatePatient(payload)
@@ -56,9 +59,12 @@ func (service *Service) Update(ctx context.Context, req types.PatientUpdateReq) 
 		Age:            req.Age,
 		Phone:          req.Phone,
 		Email:          req.Email,
-		BloodGroup:     req.BloodGroup,
 		Allergies:      req.Allergies,
 		MedicalHistory: req.MedicalHistory,
+	}
+
+	if req.BloodGroup != "" {
+		payload.BloodGroup = &req.BloodGroup
 	}
 
 	patient, err := service.patientRepo.UpdatePatient(payload)
@@ -82,13 +88,13 @@ func (service *Service) Get(ctx context.Context, filter types.PatientFilter) (ty
 	return mapToPatientResponse(patient), nil
 }
 
-func (service *Service) List(ctx context.Context, req types.PatientListReq, doctorID int) (types.PaginatedPatientResp, error) {
+func (service *Service) List(ctx context.Context, req types.PatientListReq, doctorID int) (types.PaginatedResponse[types.PatientResp], error) {
 	offset := (req.Page - 1) * req.Limit
 	patients, total, err := service.patientRepo.ListPatients(offset, req.Limit, doctorID, req.Name, req.Phone)
 	if err != nil {
 		slog.Error("failed to list patients", "error", err.Error())
 
-		return types.PaginatedPatientResp{}, err
+		return types.PaginatedResponse[types.PatientResp]{}, err
 	}
 
 	var records []types.PatientResp
@@ -96,12 +102,9 @@ func (service *Service) List(ctx context.Context, req types.PatientListReq, doct
 		records = append(records, mapToPatientResponse(patient))
 	}
 
-	lastPage := total / req.Limit
-	if total%req.Limit > 0 {
-		lastPage++
-	}
+	lastPage := (int(total) + req.Limit - 1) / req.Limit
 
-	return types.PaginatedPatientResp{
+	return types.PaginatedResponse[types.PatientResp]{
 		Pagination: types.Pagination{
 			Page:     req.Page,
 			Limit:    req.Limit,
@@ -113,7 +116,7 @@ func (service *Service) List(ctx context.Context, req types.PatientListReq, doct
 }
 
 func mapToPatientResponse(patient model.Patient) types.PatientResp {
-	return types.PatientResp{
+	resp := types.PatientResp{
 		ID:             patient.ID,
 		DoctorID:       patient.DoctorID,
 		FullName:       patient.FullName,
@@ -121,10 +124,15 @@ func mapToPatientResponse(patient model.Patient) types.PatientResp {
 		Age:            patient.Age,
 		Phone:          patient.Phone,
 		Email:          patient.Email,
-		BloodGroup:     patient.BloodGroup,
 		Allergies:      patient.Allergies,
 		MedicalHistory: patient.MedicalHistory,
 		CreatedAt:      patient.CreatedAt,
 		UpdatedAt:      patient.UpdatedAt,
 	}
+
+	if patient.BloodGroup != nil {
+		resp.BloodGroup = *patient.BloodGroup
+	}
+
+	return resp
 }

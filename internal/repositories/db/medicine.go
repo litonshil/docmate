@@ -5,36 +5,36 @@ import (
 	"fmt"
 )
 
-func (repo *Repository) CreateMedicine(medicine model.Medicine) (model.Medicine, error) {
-	err := repo.client.Create(&medicine).Error
+func (r *Repository) CreateMedicine(medicine model.Medicine) (model.Medicine, error) {
+	err := r.client.Create(&medicine).Error
 
 	return medicine, err
 }
 
-func (repo *Repository) UpdateMedicine(medicine model.Medicine) (model.Medicine, error) {
-	err := repo.client.Model(&model.Medicine{}).Where("id = ?", medicine.ID).Updates(&medicine).Error
+func (r *Repository) UpdateMedicine(medicine model.Medicine) (model.Medicine, error) {
+	err := r.client.Model(&model.Medicine{}).Where("id = ?", medicine.ID).Updates(&medicine).Error
 
 	return medicine, err
 }
 
-func (repo *Repository) GetMedicineByID(id int) (model.Medicine, error) {
+func (r *Repository) GetMedicineByID(id int) (model.Medicine, error) {
 	var medicine model.Medicine
-	if err := repo.client.Where("id = ?", id).First(&medicine).Error; err != nil {
+	if err := r.client.Where("id = ?", id).First(&medicine).Error; err != nil {
 		return model.Medicine{}, err
 	}
 
 	return medicine, nil
 }
 
-func (repo *Repository) DeleteMedicine(id int) error {
-	return repo.client.Delete(&model.Medicine{}, id).Error
+func (r *Repository) DeleteMedicine(id int) error {
+	return r.client.Delete(&model.Medicine{}, id).Error
 }
 
-func (repo *Repository) ListMedicines(offset, limit int, search string) ([]model.Medicine, int, error) {
+func (r *Repository) ListMedicines(offset, limit int, search string) ([]model.Medicine, int64, error) {
 	var medicines []model.Medicine
 	var total int64
 
-	db := repo.client.Model(&model.Medicine{})
+	db := r.client.Model(&model.Medicine{})
 
 	if search != "" {
 		searchQuery := fmt.Sprintf("%s%%", search)
@@ -52,5 +52,5 @@ func (repo *Repository) ListMedicines(offset, limit int, search string) ([]model
 		return nil, 0, err
 	}
 
-	return medicines, int(total), nil
+	return medicines, total, nil
 }

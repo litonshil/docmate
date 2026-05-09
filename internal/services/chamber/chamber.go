@@ -106,13 +106,13 @@ func (service *Service) Get(ctx context.Context, filter types.ChamberFilter) (ty
 	return mapToChamberResponse(chamber), nil
 }
 
-func (service *Service) List(ctx context.Context, req types.ChamberListReq) (types.PaginatedChamberResp, error) {
+func (service *Service) List(ctx context.Context, req types.ChamberListReq) (types.PaginatedResponse[types.ChamberResp], error) {
 	offset := (req.Page - 1) * req.Limit
 	chambers, total, err := service.chamberRepo.ListChambers(offset, req.Limit, req.DoctorID)
 	if err != nil {
 		slog.Error("failed to list chambers", "error", err.Error())
 
-		return types.PaginatedChamberResp{}, err
+		return types.PaginatedResponse[types.ChamberResp]{}, err
 	}
 
 	var records []types.ChamberResp
@@ -120,12 +120,9 @@ func (service *Service) List(ctx context.Context, req types.ChamberListReq) (typ
 		records = append(records, mapToChamberResponse(chamber))
 	}
 
-	lastPage := total / req.Limit
-	if total%req.Limit > 0 {
-		lastPage++
-	}
+	lastPage := (int(total) + req.Limit - 1) / req.Limit
 
-	return types.PaginatedChamberResp{
+	return types.PaginatedResponse[types.ChamberResp]{
 		Pagination: types.Pagination{
 			Page:     req.Page,
 			Limit:    req.Limit,

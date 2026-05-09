@@ -19,8 +19,8 @@ func NewRepository(client *gorm.DB) *Repository {
 	}
 }
 
-func (repo *Repository) CreateTransaction(ctx context.Context) (*model.TXClient, error) {
-	tx := repo.client.Begin()
+func (r *Repository) CreateTransaction(ctx context.Context) (*model.TXClient, error) {
+	tx := r.client.Begin()
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -29,9 +29,9 @@ func (repo *Repository) CreateTransaction(ctx context.Context) (*model.TXClient,
 	return transaction.NewTXClient(ctx, tx), nil
 }
 
-func (repo *Repository) dbClient(txc *model.TXClient) *gorm.DB {
+func (r *Repository) dbClient(txc *model.TXClient) *gorm.DB {
 	if txc == nil {
-		return repo.client
+		return r.client
 	}
 
 	return txc.Get().(*gorm.DB)

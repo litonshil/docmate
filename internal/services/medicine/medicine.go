@@ -70,7 +70,7 @@ func (s *Service) Delete(ctx context.Context, id int) error {
 	return s.repo.DeleteMedicine(id)
 }
 
-func (s *Service) List(ctx context.Context, req types.MedicineListReq) (types.PaginatedMedicineResp, error) {
+func (s *Service) List(ctx context.Context, req types.MedicineListReq) (types.PaginatedResponse[types.MedicineResp], error) {
 	if req.Limit == 0 {
 		req.Limit = 10
 	}
@@ -81,7 +81,7 @@ func (s *Service) List(ctx context.Context, req types.MedicineListReq) (types.Pa
 	offset := (req.Page - 1) * req.Limit
 	medicines, total, err := s.repo.ListMedicines(offset, req.Limit, req.Search)
 	if err != nil {
-		return types.PaginatedMedicineResp{}, err
+		return types.PaginatedResponse[types.MedicineResp]{}, err
 	}
 
 	var records []types.MedicineResp
@@ -89,12 +89,9 @@ func (s *Service) List(ctx context.Context, req types.MedicineListReq) (types.Pa
 		records = append(records, mapToResponse(m))
 	}
 
-	lastPage := total / req.Limit
-	if total%req.Limit > 0 {
-		lastPage++
-	}
+	lastPage := (int(total) + req.Limit - 1) / req.Limit
 
-	return types.PaginatedMedicineResp{
+	return types.PaginatedResponse[types.MedicineResp]{
 		Pagination: types.Pagination{
 			Page:     req.Page,
 			Limit:    req.Limit,

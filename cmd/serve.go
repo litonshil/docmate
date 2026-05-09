@@ -11,6 +11,7 @@ import (
 	dashboardrepo "docmate/internal/repositories/dashboard"
 	"docmate/internal/repositories/db"
 	aisettingservice "docmate/internal/services/ai_setting"
+	appointmentservice "docmate/internal/services/appointment"
 	chamberservice "docmate/internal/services/chamber"
 	dashboardservice "docmate/internal/services/dashboard"
 	doctorservice "docmate/internal/services/doctor"
@@ -57,6 +58,7 @@ func MountRoutes(ctx context.Context, e *echo.Echo) {
 
 	llmFactory := llm.NewFactory()
 	aisettingsvc := aisettingservice.NewService(dbRepo, llmFactory)
+	appointmentsvc := appointmentservice.NewAppointmentService(dbRepo)
 
 	dashrepo := dashboardrepo.NewDashboardRepo(dbClient)
 	dashboardsvc := dashboardservice.NewDashboardService(dashrepo)
@@ -72,8 +74,9 @@ func MountRoutes(ctx context.Context, e *echo.Echo) {
 	prescriptionSettingController := controllers.NewPrescriptionSettingController(prescriptionsettingsvc, dbRepo)
 	dashboardController := controllers.NewDashboardController(ctx, dashboardsvc, dbRepo)
 	aiSettingController := controllers.NewAISuggestionController(ctx, aisettingsvc, dbRepo)
+	appointmentController := controllers.NewAppointmentController(appointmentsvc, dbRepo)
 
-	routes := httpRoutes.New(e, userController, doctorController, patientController, chamberController, medicineController, prescriptionController, prescriptionSettingController, dashboardController, aiSettingController)
+	routes := httpRoutes.New(e, userController, doctorController, patientController, chamberController, medicineController, prescriptionController, prescriptionSettingController, dashboardController, aiSettingController, appointmentController)
 	routes.Init()
 }
 

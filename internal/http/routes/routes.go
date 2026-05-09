@@ -21,6 +21,7 @@ type Routes struct {
 	uploadController              *controllers.UploadController
 	dashboardController           *controllers.DashboardController
 	aiSettingController           *controllers.AISuggestionController
+	appointmentController         *controllers.AppointmentController
 }
 
 func New(
@@ -34,6 +35,7 @@ func New(
 	prescriptionSettingController *controllers.PrescriptionSettingController,
 	dashboardController *controllers.DashboardController,
 	aiSettingController *controllers.AISuggestionController,
+	appointmentController *controllers.AppointmentController,
 ) *Routes {
 	return &Routes{
 		echo:                          e,
@@ -47,6 +49,7 @@ func New(
 		uploadController:              controllers.NewUploadController(),
 		dashboardController:           dashboardController,
 		aiSettingController:           aiSettingController,
+		appointmentController:         appointmentController,
 	}
 }
 
@@ -115,6 +118,14 @@ func (r *Routes) Init() {
 	dashboard := v1.Group("/dashboard", middlewares.AuthRoles(consts.RoleDoctor))
 	{
 		dashboard.GET("/summary", r.dashboardController.GetSummary)
+	}
+
+	appointments := v1.Group("/appointments", middlewares.AuthRoles(consts.RoleDoctor))
+	{
+		appointments.GET("", r.appointmentController.List)
+		appointments.POST("", r.appointmentController.Book)
+		appointments.GET("/:id", r.appointmentController.GetDetails)
+		appointments.PATCH("/:id/status", r.appointmentController.UpdateStatus)
 	}
 
 	aiSuggestions := v1.Group("/suggestions", middlewares.AuthRoles(consts.RoleDoctor))

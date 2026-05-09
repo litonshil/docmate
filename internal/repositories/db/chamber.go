@@ -4,33 +4,33 @@ import (
 	"docmate/internal/model"
 )
 
-func (repo *Repository) CreateChamber(chamber model.Chamber) (model.Chamber, error) {
-	err := repo.client.Create(&chamber).Error
+func (r *Repository) CreateChamber(chamber model.Chamber) (model.Chamber, error) {
+	err := r.client.Create(&chamber).Error
 
 	return chamber, err
 }
 
-func (repo *Repository) UpdateChamber(chamber model.Chamber) (model.Chamber, error) {
+func (r *Repository) UpdateChamber(chamber model.Chamber) (model.Chamber, error) {
 	// Omit CreatedAt and let GORM handle UpdatedAt automatically
-	err := repo.client.Model(&model.Chamber{}).Where("id = ?", chamber.ID).Omit("created_at").Updates(&chamber).Error
+	err := r.client.Model(&model.Chamber{}).Where("id = ?", chamber.ID).Omit("created_at").Updates(&chamber).Error
 
 	return chamber, err
 }
 
-func (repo *Repository) GetChamberByID(id int) (model.Chamber, error) {
+func (r *Repository) GetChamberByID(id int) (model.Chamber, error) {
 	var chamber model.Chamber
-	if err := repo.dbClient(nil).Model(&model.Chamber{}).Where("id = ?", id).First(&chamber).Error; err != nil {
+	if err := r.dbClient(nil).Model(&model.Chamber{}).Where("id = ?", id).First(&chamber).Error; err != nil {
 		return model.Chamber{}, err
 	}
 
 	return chamber, nil
 }
 
-func (repo *Repository) ListChambers(offset, limit, doctorID int) ([]model.Chamber, int, error) {
+func (r *Repository) ListChambers(offset, limit, doctorID int) ([]model.Chamber, int64, error) {
 	var chambers []model.Chamber
 	var total int64
 
-	query := repo.client.Model(&model.Chamber{})
+	query := r.client.Model(&model.Chamber{})
 
 	if doctorID > 0 {
 		query = query.Where("doctor_id = ?", doctorID)
@@ -44,5 +44,5 @@ func (repo *Repository) ListChambers(offset, limit, doctorID int) ([]model.Chamb
 		return nil, 0, err
 	}
 
-	return chambers, int(total), nil
+	return chambers, total, nil
 }
