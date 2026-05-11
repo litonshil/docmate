@@ -30,6 +30,10 @@ func (r *appointmentRepo) UpdateAppointment(appointment *model.Appointment) erro
 	return r.db.Save(appointment).Error
 }
 
+func (r *appointmentRepo) UpdateAppointmentFields(id int, updates map[string]interface{}) error {
+	return r.db.Model(&model.Appointment{}).Where("id = ?", id).Updates(updates).Error
+}
+
 func (r *appointmentRepo) ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]model.Appointment, int64, error) {
 	var appointments []model.Appointment
 	var total int64
