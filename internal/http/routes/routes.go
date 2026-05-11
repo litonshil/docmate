@@ -126,6 +126,7 @@ func (r *Routes) Init() {
 		appointments.POST("", r.appointmentController.Book)
 		appointments.GET("/:id", r.appointmentController.GetDetails)
 		appointments.PATCH("/:id/status", r.appointmentController.UpdateStatus)
+		appointments.PATCH("/:id/collect-fee", r.appointmentController.CollectFee)
 	}
 
 	aiSuggestions := v1.Group("/suggestions", middlewares.AuthRoles(consts.RoleDoctor))

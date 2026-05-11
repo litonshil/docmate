@@ -20,6 +20,10 @@ func (r *Repository) UpdateAppointment(appointment *model.Appointment) error {
 	return r.client.Save(appointment).Error
 }
 
+func (r *Repository) UpdateAppointmentFields(id int, updates map[string]interface{}) error {
+	return r.client.Model(&model.Appointment{}).Where("id = ?", id).Updates(updates).Error
+}
+
 func (r *Repository) ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]model.Appointment, int64, error) {
 	var appointments []model.Appointment
 	var total int64

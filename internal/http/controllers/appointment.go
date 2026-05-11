@@ -101,6 +101,26 @@ func (ctrl *AppointmentController) UpdateStatus(c echo.Context) error {
 	return response.Success(c, "Appointment status updated successfully", nil)
 }
 
+func (ctrl *AppointmentController) CollectFee(c echo.Context) error {
+	ctx := c.Request().Context()
+	id, _ := strconv.Atoi(c.Param("id"))
+	if id == 0 {
+		return response.BadRequest(c, "Invalid appointment ID")
+	}
+
+	var req types.CollectFeeReq
+	if err := c.Bind(&req); err != nil {
+		return response.BadRequest(c, "Invalid request body")
+	}
+
+	err := ctrl.svc.CollectFee(ctx, id, req.Amount)
+	if err != nil {
+		return response.InternalServerError(c, "Failed to collect fee")
+	}
+
+	return response.Success(c, "Fee collected successfully", nil)
+}
+
 func (ctrl *AppointmentController) GetDetails(c echo.Context) error {
 	ctx := c.Request().Context()
 	id, _ := strconv.Atoi(c.Param("id"))

@@ -15,6 +15,7 @@ type AppointmentReq struct {
 	EndTime         string        `json:"end_time"`
 	Reason          string        `json:"reason"`
 	Notes           string        `json:"notes"`
+	VisitingFee     float64       `json:"visiting_fee"`
 	QuickPatient    *QuickPatient `json:"quick_patient"` // Optional for Quick Add
 }
 
@@ -55,6 +56,8 @@ type AppointmentResp struct {
 	Status          string       `json:"status"`
 	Reason          string       `json:"reason"`
 	Notes           string       `json:"notes"`
+	VisitingFee     float64      `json:"visiting_fee"`
+	IsFeeCollected  bool         `json:"is_fee_collected"`
 	CreatedAt       time.Time    `json:"created_at"`
 	UpdatedAt       time.Time    `json:"updated_at"`
 	Patient         *PatientResp `json:"patient,omitempty"`
@@ -63,4 +66,8 @@ type AppointmentResp struct {
 
 type UpdateAppointmentStatusReq struct {
 	Status string `json:"status"`
+}
+
+type CollectFeeReq struct {
+	Amount float64 `json:"amount"`
 }

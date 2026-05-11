@@ -52,6 +52,7 @@ func (s *appointmentService) BookAppointment(ctx context.Context, req types.Appo
 		EndTime:         req.EndTime,
 		Reason:          req.Reason,
 		Notes:           req.Notes,
+		VisitingFee:     req.VisitingFee,
 		Status:          model.AppointmentStatusPending,
 	}
 
@@ -104,6 +105,29 @@ func (s *appointmentService) UpdateStatus(ctx context.Context, id int, status mo
 	err = s.repo.UpdateAppointment(appointment)
 	if err != nil {
 		slog.Error("failed to update appointment status", "id", id, "status", status, "error", err.Error())
+	}
+
+	return err
+}
+
+func (s *appointmentService) CollectFee(ctx context.Context, id int, amount float64) error {
+	appointment, err := s.repo.GetAppointmentByID(id)
+	if err != nil {
+		return err
+	}
+
+	updates := map[string]interface{}{
+		"is_fee_collected": true,
+	}
+	if amount > 0 {
+		updates["visiting_fee"] = amount
+	} else if appointment.VisitingFee > 0 {
+		updates["visiting_fee"] = appointment.VisitingFee
+	}
+
+	err = s.repo.UpdateAppointmentFields(id, updates)
+	if err != nil {
+		slog.Error("failed to collect fee", "id", id, "error", err.Error())
 	}
 
 	return err
@@ -182,6 +206,8 @@ func mapToAppointmentResponse(app model.Appointment) types.AppointmentResp {
 		Status:          string(app.Status),
 		Reason:          app.Reason,
 		Notes:           app.Notes,
+		VisitingFee:     app.VisitingFee,
+		IsFeeCollected:  app.IsFeeCollected,
 		CreatedAt:       app.CreatedAt,
 		UpdatedAt:       app.UpdatedAt,
 	}
