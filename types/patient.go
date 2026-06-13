@@ -66,7 +66,8 @@ func (f PatientFilter) Validate() error {
 
 type PatientListReq struct {
 	Pagination
-	Search string `json:"search" query:"search"`
+	Search   string `json:"search" query:"search"`
+	DoctorID int    `json:"doctor_id" query:"doctor_id"`
 }
 
 type PatientResp struct {

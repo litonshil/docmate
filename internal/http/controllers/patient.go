@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"docmate/internal/consts"
 	"docmate/internal/logger"
 	"docmate/internal/model"
 	"docmate/response"
@@ -109,11 +110,6 @@ func (controller *PatientController) Get(c echo.Context) error {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
-	doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
-	if err != nil {
-		return response.BadRequest(c, "Doctor profile not found for user")
-	}
-
 	var filter types.PatientFilter
 	if err := c.Bind(&filter); err != nil {
 		return response.BadRequest(c, "invalid patient id")
@@ -128,9 +124,17 @@ func (controller *PatientController) Get(c echo.Context) error {
 		return response.InternalServerError(c, "failed to get patient")
 	}
 
-	// Verify Ownership
-	if patient.DoctorID != doctor.ID {
-		return response.Unauthorized(c, "unauthorized to view this patient profile")
+	// Verify Ownership for doctors
+	if user.Role == consts.RoleDoctor {
+		doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Doctor profile not found for user")
+		}
+		if patient.DoctorID != doctor.ID {
+			return response.Unauthorized(c, "unauthorized to view this patient profile")
+		}
+	} else if user.Role != consts.RoleAdmin {
+		return response.Forbidden(c, "Forbidden")
 	}
 
 	return response.Success(c, "patient fetched successfully", patient)
@@ -143,14 +147,22 @@ func (controller *PatientController) List(c echo.Context) error {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
-	doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
-	if err != nil {
-		return response.BadRequest(c, "Doctor profile not found for user")
-	}
-
 	var req types.PatientListReq
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, err.Error())
+	}
+
+	var doctorID int
+	if user.Role == consts.RoleDoctor {
+		doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Doctor profile not found for user")
+		}
+		doctorID = doctor.ID
+	} else if user.Role == consts.RoleAdmin {
+		doctorID = req.DoctorID
+	} else {
+		return response.Forbidden(c, "Forbidden")
 	}
 
 	// Set defaults
@@ -161,7 +173,7 @@ func (controller *PatientController) List(c echo.Context) error {
 		req.Limit = 10
 	}
 
-	resp, err := controller.patientSvc.List(ctx, req, doctor.ID)
+	resp, err := controller.patientSvc.List(ctx, req, doctorID)
 	if err != nil {
 		return response.InternalServerError(c, err.Error())
 	}

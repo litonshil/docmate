@@ -76,7 +76,7 @@ func (r *Routes) Init() {
 		doctors.PATCH("/:id/ai-settings", r.aiSettingController.AdminUpdateSettings, middlewares.AuthRoles(consts.RoleAdmin))
 	}
 
-	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleDoctor))
+	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
 	{
 		patients.GET("", r.patientController.List)
 		patients.POST("", r.patientController.Create)
