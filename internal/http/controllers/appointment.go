@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"docmate/internal/consts"
 	"docmate/internal/model"
 	"docmate/response"
 	"docmate/types"
@@ -54,9 +55,17 @@ func (ctrl *AppointmentController) List(c echo.Context) error {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
-	doctor, err := ctrl.doctorRepo.GetDoctorByUserID(user.ID)
-	if err != nil {
-		return response.BadRequest(c, "Doctor profile not found")
+	var doctorID int
+	if user.Role == consts.RoleDoctor {
+		doctor, err := ctrl.doctorRepo.GetDoctorByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Doctor profile not found")
+		}
+		doctorID = doctor.ID
+	} else if user.Role == consts.RoleAdmin {
+		doctorID = 0
+	} else {
+		return response.Forbidden(c, "Forbidden")
 	}
 
 	dateFrom := c.QueryParam("date_from")
@@ -73,7 +82,7 @@ func (ctrl *AppointmentController) List(c echo.Context) error {
 		limit = 10
 	}
 
-	paginatedResp, err := ctrl.svc.ListAppointments(ctx, doctor.ID, dateFrom, dateTo, status, search, page, limit)
+	paginatedResp, err := ctrl.svc.ListAppointments(ctx, doctorID, dateFrom, dateTo, status, search, page, limit)
 	if err != nil {
 		return response.InternalServerError(c, "Failed to list appointments")
 	}

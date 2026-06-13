@@ -5,6 +5,7 @@ type DashboardSummaryResp struct {
 	TodayVisits        int               `json:"today_visits"`
 	TotalPrescriptions int               `json:"total_prescriptions"`
 	ActiveMedicines    int               `json:"active_medicines"`
+	TotalDoctors       int               `json:"total_doctors,omitempty"`
 	RecentPatients     []PatientSummary  `json:"recent_patients"`
 	TodaySchedule      []ScheduleSummary `json:"today_schedule"`
 }

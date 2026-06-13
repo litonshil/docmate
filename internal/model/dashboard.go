@@ -14,6 +14,7 @@ type DashboardRepo interface {
 	GetTodayVisits(ctx context.Context, doctorID int) (int, error)
 	GetTotalPrescriptions(ctx context.Context, doctorID int) (int, error)
 	GetActiveMedicines(ctx context.Context, doctorID int) (int, error)
+	GetTotalDoctors(ctx context.Context) (int, error)
 	GetRecentPatients(ctx context.Context, doctorID int, limit int) ([]types.PatientSummary, error)
 	GetTodaySchedule(ctx context.Context, doctorID int) ([]types.ScheduleSummary, error)
 }

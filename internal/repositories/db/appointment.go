@@ -28,14 +28,19 @@ func (r *Repository) ListAppointments(doctorID int, dateFrom, dateTo *time.Time,
 	var appointments []model.Appointment
 	var total int64
 
-	query := r.client.Model(&model.Appointment{}).Where("doctor_id = ?", doctorID)
+	query := r.client.Model(&model.Appointment{})
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
 
 	if search != "" {
 		var patientIDs []int
 		searchPattern := "%" + search + "%"
-		// Find patients matching the search term for this doctor
-		r.client.Model(&model.Patient{}).
-			Where("doctor_id = ? AND (full_name ILIKE ? OR phone ILIKE ?)", doctorID, searchPattern, searchPattern).
+		patientQuery := r.client.Model(&model.Patient{})
+		if doctorID != 0 {
+			patientQuery = patientQuery.Where("doctor_id = ?", doctorID)
+		}
+		patientQuery.Where("full_name ILIKE ? OR phone ILIKE ?", searchPattern, searchPattern).
 			Pluck("id", &patientIDs)
 
 		if len(patientIDs) == 0 {

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"docmate/internal/consts"
 	"docmate/internal/model"
 	"docmate/response"
 	"docmate/utils/contextutil"
@@ -36,14 +37,21 @@ func (controller *DashboardController) GetSummary(c echo.Context) error {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
-	// Resolve the Doctor profile linked to the user
-	doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
-	if err != nil {
-		return response.BadRequest(c, "Doctor profile not found for user")
+	var doctorID int
+	if user.Role == consts.RoleDoctor {
+		doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Doctor profile not found for user")
+		}
+		doctorID = doctor.ID
+	} else if user.Role == consts.RoleAdmin {
+		doctorID = 0
+	} else {
+		return response.Forbidden(c, "Forbidden")
 	}
 
 	// Fetch Summary
-	resp, err := controller.dashboardSvc.GetSummary(ctx, doctor.ID)
+	resp, err := controller.dashboardSvc.GetSummary(ctx, doctorID)
 	if err != nil {
 		return response.InternalServerError(c, "Failed to load dashboard summary")
 	}

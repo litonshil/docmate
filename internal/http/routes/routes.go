@@ -115,12 +115,12 @@ func (r *Routes) Init() {
 		prescriptionSettings.POST("", r.prescriptionSettingController.Upsert)
 	}
 
-	dashboard := v1.Group("/dashboard", middlewares.AuthRoles(consts.RoleDoctor))
+	dashboard := v1.Group("/dashboard", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
 	{
 		dashboard.GET("/summary", r.dashboardController.GetSummary)
 	}
 
-	appointments := v1.Group("/appointments", middlewares.AuthRoles(consts.RoleDoctor))
+	appointments := v1.Group("/appointments", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
 	{
 		appointments.GET("", r.appointmentController.List)
 		appointments.POST("", r.appointmentController.Book)

@@ -19,7 +19,11 @@ func NewDashboardRepo(db *gorm.DB) model.DashboardRepo {
 
 func (r *dashboardRepo) GetTotalPatients(ctx context.Context, doctorID int) (int, error) {
 	var count int64
-	err := r.db.WithContext(ctx).Model(&model.Patient{}).Where("doctor_id = ?", doctorID).Count(&count).Error
+	query := r.db.WithContext(ctx).Model(&model.Patient{})
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
+	err := query.Count(&count).Error
 
 	return int(count), err
 }
@@ -27,16 +31,22 @@ func (r *dashboardRepo) GetTotalPatients(ctx context.Context, doctorID int) (int
 func (r *dashboardRepo) GetTodayVisits(ctx context.Context, doctorID int) (int, error) {
 	var count int64
 	today := time.Now().Truncate(24 * time.Hour)
-	err := r.db.WithContext(ctx).Model(&model.Prescription{}).
-		Where("doctor_id = ? AND created_at >= ?", doctorID, today).
-		Count(&count).Error
+	query := r.db.WithContext(ctx).Model(&model.Prescription{}).Where("created_at >= ?", today)
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
+	err := query.Count(&count).Error
 
 	return int(count), err
 }
 
 func (r *dashboardRepo) GetTotalPrescriptions(ctx context.Context, doctorID int) (int, error) {
 	var count int64
-	err := r.db.WithContext(ctx).Model(&model.Prescription{}).Where("doctor_id = ?", doctorID).Count(&count).Error
+	query := r.db.WithContext(ctx).Model(&model.Prescription{})
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
+	err := query.Count(&count).Error
 
 	return int(count), err
 }
@@ -50,11 +60,11 @@ func (r *dashboardRepo) GetActiveMedicines(ctx context.Context, doctorID int) (i
 
 func (r *dashboardRepo) GetRecentPatients(ctx context.Context, doctorID int, limit int) ([]types.PatientSummary, error) {
 	var patients []model.Patient
-	err := r.db.WithContext(ctx).
-		Where("doctor_id = ?", doctorID).
-		Order("created_at desc").
-		Limit(limit).
-		Find(&patients).Error
+	query := r.db.WithContext(ctx).Model(&model.Patient{})
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
+	err := query.Order("created_at desc").Limit(limit).Find(&patients).Error
 
 	if err != nil {
 		return nil, err
@@ -79,12 +89,13 @@ func (r *dashboardRepo) GetTodaySchedule(ctx context.Context, doctorID int) ([]t
 	today := time.Now().Truncate(24 * time.Hour)
 	tomorrow := today.Add(24 * time.Hour)
 
-	err := r.db.WithContext(ctx).
-		Preload("Patient").
-		Where("doctor_id = ? AND appointment_date >= ? AND appointment_date < ? AND status != ?",
-			doctorID, today, tomorrow, model.AppointmentStatusCancelled).
-		Order("start_time asc").
-		Find(&appointments).Error
+	query := r.db.WithContext(ctx).Preload("Patient").
+		Where("appointment_date >= ? AND appointment_date < ? AND status != ?",
+			today, tomorrow, model.AppointmentStatusCancelled)
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
+	err := query.Order("start_time asc").Find(&appointments).Error
 
 	if err != nil {
 		return nil, err
@@ -103,4 +114,11 @@ func (r *dashboardRepo) GetTodaySchedule(ctx context.Context, doctorID int) ([]t
 	}
 
 	return summaries, nil
+}
+
+func (r *dashboardRepo) GetTotalDoctors(ctx context.Context) (int, error) {
+	var count int64
+	err := r.db.WithContext(ctx).Model(&model.Doctor{}).Count(&count).Error
+
+	return int(count), err
 }

@@ -80,6 +80,18 @@ func (s *dashboardService) GetSummary(ctx context.Context, doctorID int) (types.
 		return err
 	})
 
+	// Fetch Total Doctors (only if admin)
+	if doctorID == 0 {
+		g.Go(func() error {
+			count, err := s.repo.GetTotalDoctors(ctx)
+			if err == nil {
+				resp.TotalDoctors = count
+			}
+
+			return err
+		})
+	}
+
 	// Wait for all queries to finish concurrently
 	if err := g.Wait(); err != nil {
 		return types.DashboardSummaryResp{}, err
