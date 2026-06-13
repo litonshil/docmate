@@ -8,6 +8,8 @@ import (
 	"docmate/types"
 	"errors"
 	"log/slog"
+
+	"gorm.io/gorm"
 )
 
 type Service struct {
@@ -60,6 +62,16 @@ func (s *Service) AdminUpdate(ctx context.Context, req types.AdminAISettingUpdat
 func (s *Service) GetByDoctor(ctx context.Context, doctorID int) (types.AISettingResp, error) {
 	setting, err := s.repo.GetAISettingByDoctor(doctorID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			defaultSetting := model.AISetting{
+				DoctorID:         doctorID,
+				IsAIEnabled:      false,
+				AllowGlobalAPI:   false,
+				UseIndividualKey: false,
+			}
+
+			return mapToResponse(defaultSetting), nil
+		}
 		slog.Error("failed to get ai setting", "doctor_id", doctorID, "error", err.Error())
 
 		return types.AISettingResp{}, err
