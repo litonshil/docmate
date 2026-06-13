@@ -26,6 +26,8 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /app /app
 # Import the migrations directory from the builder stage.
 COPY --from=builder /src/migrations /migrations
+# Import the docs directory for database seeding.
+COPY --from=builder /src/docs /docs
 
 EXPOSE 8080
 
