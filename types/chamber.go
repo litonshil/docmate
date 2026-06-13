@@ -89,7 +89,7 @@ func (f ChamberFilter) Validate() error {
 
 type ChamberListReq struct {
 	Pagination
-	DoctorID int `json:"-" param:"doctor_id"`
+	DoctorID int `json:"doctor_id" query:"doctor_id" param:"doctor_id"`
 }
 
 type ChamberResp struct {

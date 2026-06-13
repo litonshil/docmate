@@ -149,18 +149,32 @@ func (controller *ChamberController) Get(c echo.Context) error {
 
 func (controller *ChamberController) List(c echo.Context) error {
 	ctx := c.Request().Context()
+	user, err := contextutil.GetUserFromContext(c)
+	if err != nil {
+		return response.Unauthorized(c, "Unauthorized")
+	}
 
 	var req types.ChamberListReq
 	if err := c.Bind(&req); err != nil {
 		return response.BadRequest(c, err.Error())
 	}
 
-	if req.DoctorID == 0 {
-		return response.BadRequest(c, "doctor id is required")
-	}
-
-	if err := controller.authorizeDoctor(c, req.DoctorID); err != nil {
-		return err
+	// For doctors, force listing only their own chambers.
+	if user.Role == consts.RoleDoctor {
+		doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Doctor profile not found for user")
+		}
+		req.DoctorID = doctor.ID
+	} else if user.Role == consts.RoleAdmin {
+		// For admins, doctor ID is optional. If specified, validate existence.
+		if req.DoctorID > 0 {
+			if _, err := controller.doctorRepo.GetDoctorByID(req.DoctorID); err != nil {
+				return response.BadRequest(c, "Doctor not found")
+			}
+		}
+	} else {
+		return response.Forbidden(c, "Forbidden")
 	}
 
 	// Set defaults

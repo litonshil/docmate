@@ -92,6 +92,11 @@ func (r *Routes) Init() {
 		chambers.PUT("/:id", r.chamberController.Update)
 	}
 
+	globalChambers := v1.Group("/chambers", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	{
+		globalChambers.GET("", r.chamberController.List)
+	}
+
 	medicines := v1.Group("/medicines", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
 	{
 		medicines.GET("", r.medicineController.List)
