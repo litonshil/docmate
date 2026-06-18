@@ -24,10 +24,14 @@ type AISettingUseCase interface {
 	AdminUpdate(ctx context.Context, req types.AdminAISettingUpdateReq) (types.AISettingResp, error)
 	GetByDoctor(ctx context.Context, doctorID int) (types.AISettingResp, error)
 	GetSuggestions(ctx context.Context, doctorID int, complaints []string) (*types.AISuggestionResp, error)
+	GetGlobalSetting(ctx context.Context, key string) (string, error)
+	SetGlobalSetting(ctx context.Context, key string, value string) error
 }
 
 type AISettingRepo interface {
 	UpsertAISetting(setting AISetting) (AISetting, error)
 	AdminUpdateAISetting(setting AISetting) (AISetting, error)
 	GetAISettingByDoctor(doctorID int) (AISetting, error)
+	GetGlobalSetting(key string) (string, error)
+	SetGlobalSetting(key string, value string) error
 }

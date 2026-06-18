@@ -44,9 +44,10 @@ func (s *Service) Upsert(ctx context.Context, req types.AISettingReq) (types.AIS
 
 func (s *Service) AdminUpdate(ctx context.Context, req types.AdminAISettingUpdateReq) (types.AISettingResp, error) {
 	payload := model.AISetting{
-		DoctorID:       req.DoctorID,
-		IsAIEnabled:    req.IsAIEnabled,
-		AllowGlobalAPI: req.AllowGlobalAPI,
+		DoctorID:         req.DoctorID,
+		IsAIEnabled:      req.IsAIEnabled,
+		AllowGlobalAPI:   req.AllowGlobalAPI,
+		UseIndividualKey: req.UseIndividualKey,
 	}
 
 	setting, err := s.repo.AdminUpdateAISetting(payload)
@@ -102,8 +103,21 @@ func (s *Service) GetSuggestions(ctx context.Context, doctorID int, complaints [
 		providerName = setting.Provider
 	} else if setting.AllowGlobalAPI {
 		slog.Info("using global system API key", "doctor_id", doctorID)
-		apiKey = config.AI().GeminiAPIKey
-		providerName = config.AI().Provider
+
+		dbKey, keyErr := s.repo.GetGlobalSetting("ai_global_api_key")
+		dbProvider, providerErr := s.repo.GetGlobalSetting("ai_global_provider")
+
+		if keyErr == nil && dbKey != "" {
+			apiKey = dbKey
+		} else {
+			apiKey = config.AI().GeminiAPIKey
+		}
+
+		if providerErr == nil && dbProvider != "" {
+			providerName = dbProvider
+		} else {
+			providerName = config.AI().Provider
+		}
 	} else {
 		slog.Warn("no credentials available", "doctor_id", doctorID)
 
@@ -138,4 +152,21 @@ func mapToResponse(setting model.AISetting) types.AISettingResp {
 		CreatedAt:        setting.CreatedAt,
 		UpdatedAt:        setting.UpdatedAt,
 	}
+}
+
+func (s *Service) GetGlobalSetting(ctx context.Context, key string) (string, error) {
+	val, err := s.repo.GetGlobalSetting(key)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", nil
+		}
+
+		return "", err
+	}
+
+	return val, nil
+}
+
+func (s *Service) SetGlobalSetting(ctx context.Context, key string, value string) error {
+	return s.repo.SetGlobalSetting(key, value)
 }

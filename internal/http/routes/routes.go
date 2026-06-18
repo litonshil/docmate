@@ -73,6 +73,7 @@ func (r *Routes) Init() {
 		doctors.POST("", r.doctorController.Create)
 		doctors.GET("/:id", r.doctorController.Get)
 		doctors.PUT("/:id", r.doctorController.Update)
+		doctors.GET("/:id/ai-settings", r.aiSettingController.AdminGetSettings, middlewares.AuthRoles(consts.RoleAdmin))
 		doctors.PATCH("/:id/ai-settings", r.aiSettingController.AdminUpdateSettings, middlewares.AuthRoles(consts.RoleAdmin))
 	}
 
@@ -139,10 +140,12 @@ func (r *Routes) Init() {
 		aiSuggestions.POST("", r.aiSettingController.GetSuggestions)
 	}
 
-	aiSettings := v1.Group("/settings/ai", middlewares.AuthRoles(consts.RoleDoctor))
+	aiSettings := v1.Group("/settings/ai", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
 	{
 		aiSettings.GET("", r.aiSettingController.GetSettings)
 		aiSettings.POST("", r.aiSettingController.UpsertSettings)
+		aiSettings.GET("/global", r.aiSettingController.GetGlobalSettings, middlewares.AuthRoles(consts.RoleAdmin))
+		aiSettings.POST("/global", r.aiSettingController.UpdateGlobalSettings, middlewares.AuthRoles(consts.RoleAdmin))
 	}
 
 	// Upload route
