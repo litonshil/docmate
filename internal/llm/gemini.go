@@ -45,7 +45,11 @@ type geminiResponse struct {
 	} `json:"candidates"`
 }
 
-func (p *GeminiProvider) GenerateSuggestions(ctx context.Context, apiKey string, complaints []string) (*types.AISuggestionResp, error) {
+func (p *GeminiProvider) GenerateSuggestions(ctx context.Context, apiKey, modelName string, complaints []string) (*types.AISuggestionResp, error) {
+	if modelName == "" {
+		modelName = p.ModelName
+	}
+
 	prompt := fmt.Sprintf(`As a medical assistant, analyze these chief complaints: "%s".
 Suggest potential diagnoses and medical investigations.
 Return the result strictly as a JSON object with two arrays: "diagnoses" and "investigations".
@@ -73,7 +77,7 @@ Do not include any other text or formatting.`, strings.Join(complaints, ", "))
 		return nil, err
 	}
 
-	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1/models/%s:generateContent?key=%s", p.ModelName, apiKey)
+	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1/models/%s:generateContent?key=%s", modelName, apiKey)
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		return nil, err

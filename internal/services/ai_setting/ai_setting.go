@@ -133,9 +133,10 @@ func (s *Service) GetByDoctor(ctx context.Context, doctorID int) (types.AISettin
 		provMap[p.ID] = p
 		if p.IsActive {
 			activeProviders = append(activeProviders, types.ActiveProviderInfo{
-				ID:   p.ID,
-				Name: p.Name,
-				Slug: p.Slug,
+				ID:    p.ID,
+				Name:  p.Name,
+				Slug:  p.Slug,
+				Model: p.Model,
 			})
 			if defaultProviderID == 0 {
 				defaultProviderID = p.ID
@@ -262,7 +263,7 @@ func (s *Service) GetSuggestions(ctx context.Context, doctorID int, complaints [
 
 	slog.Info("requesting AI suggestions", "doctor_id", doctorID, "provider", prov.Slug, "model", prov.Model)
 
-	return provider.GenerateSuggestions(ctx, apiKey, complaints)
+	return provider.GenerateSuggestions(ctx, apiKey, prov.Model, complaints)
 }
 
 func (s *Service) GetProviders(ctx context.Context) ([]types.AIProviderConfig, error) {

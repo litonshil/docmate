@@ -12,9 +12,10 @@ type AIProviderConfig struct {
 }
 
 type ActiveProviderInfo struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Slug string `json:"slug"`
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	Slug  string `json:"slug"`
+	Model string `json:"model"`
 }
 
 type AISettingReq struct {
