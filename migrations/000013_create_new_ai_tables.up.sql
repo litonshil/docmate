@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS ai_providers (
 
 -- Pre-populate default providers
 INSERT INTO ai_providers (name, slug, api_key, model, is_active) VALUES
-('Google Gemini', 'gemini', '', 'gemini-1.5-flash', true),
+('Google Gemini', 'gemini', '', 'gemini-2.5-flash', true),
 ('ChatGPT', 'chatgpt', '', 'gpt-4o-mini', true)
 ON CONFLICT (slug) DO NOTHING;
 
