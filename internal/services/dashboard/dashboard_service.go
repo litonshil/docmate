@@ -80,6 +80,26 @@ func (s *dashboardService) GetSummary(ctx context.Context, doctorID int) (types.
 		return err
 	})
 
+	// Fetch Today's Collection
+	g.Go(func() error {
+		sum, err := s.repo.GetTodayCollection(ctx, doctorID)
+		if err == nil {
+			resp.TodayCollection = sum
+		}
+
+		return err
+	})
+
+	// Fetch Total Collection
+	g.Go(func() error {
+		sum, err := s.repo.GetTotalCollection(ctx, doctorID)
+		if err == nil {
+			resp.TotalCollection = sum
+		}
+
+		return err
+	})
+
 	// Fetch Total Doctors (only if admin)
 	if doctorID == 0 {
 		g.Go(func() error {

@@ -122,3 +122,28 @@ func (r *dashboardRepo) GetTotalDoctors(ctx context.Context) (int, error) {
 
 	return int(count), err
 }
+
+func (r *dashboardRepo) GetTodayCollection(ctx context.Context, doctorID int) (float64, error) {
+	var sum float64
+	today := time.Now().Truncate(24 * time.Hour)
+	query := r.db.WithContext(ctx).Model(&model.Appointment{}).
+		Where("appointment_date = ? AND is_fee_collected = ?", today, true)
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
+	err := query.Select("COALESCE(SUM(visiting_fee), 0)").Row().Scan(&sum)
+
+	return sum, err
+}
+
+func (r *dashboardRepo) GetTotalCollection(ctx context.Context, doctorID int) (float64, error) {
+	var sum float64
+	query := r.db.WithContext(ctx).Model(&model.Appointment{}).
+		Where("is_fee_collected = ?", true)
+	if doctorID != 0 {
+		query = query.Where("doctor_id = ?", doctorID)
+	}
+	err := query.Select("COALESCE(SUM(visiting_fee), 0)").Row().Scan(&sum)
+
+	return sum, err
+}
