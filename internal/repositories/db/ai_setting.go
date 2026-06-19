@@ -4,53 +4,109 @@ import (
 	"docmate/internal/model"
 	"time"
 
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
-func (r *Repository) UpsertAISetting(setting model.AISetting) (model.AISetting, error) {
-	err := r.client.Model(&model.AISetting{}).
-		Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "doctor_id"}},
-			DoUpdates: clause.AssignmentColumns([]string{"provider", "individual_api_key", "use_individual_key", "updated_at"}),
-		}).Create(&setting).Error
-
-	return setting, err
-}
-
-func (r *Repository) AdminUpdateAISetting(setting model.AISetting) (model.AISetting, error) {
-	err := r.client.Model(&model.AISetting{}).
-		Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "doctor_id"}},
-			DoUpdates: clause.AssignmentColumns([]string{"is_ai_enabled", "allow_global_api", "use_individual_key", "updated_at"}),
-		}).Create(&setting).Error
-
-	return setting, err
-}
-
-func (r *Repository) GetAISettingByDoctor(doctorID int) (model.AISetting, error) {
-	var setting model.AISetting
-	err := r.client.Model(&model.AISetting{}).
+func (r *Repository) GetDoctorSettings(doctorID int) ([]model.DoctorAISetting, error) {
+	var settings []model.DoctorAISetting
+	err := r.client.Model(&model.DoctorAISetting{}).
 		Where("doctor_id = ?", doctorID).
-		First(&setting).Error
+		Find(&settings).Error
+
+	return settings, err
+}
+
+func (r *Repository) UpsertDoctorSetting(setting model.DoctorAISetting) (model.DoctorAISetting, error) {
+	err := r.client.Model(&model.DoctorAISetting{}).
+		Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "doctor_id"}, {Name: "ai_providers_id"}},
+			DoUpdates: clause.AssignmentColumns([]string{"individual_api_key", "is_active", "use_individual_key", "is_ai_enabled", "allow_global_api", "updated_at"}),
+		}).Create(&setting).Error
 
 	return setting, err
 }
 
-func (r *Repository) GetGlobalSetting(key string) (string, error) {
-	var setting model.GlobalSetting
-	err := r.client.Model(&model.GlobalSetting{}).Where("key = ?", key).First(&setting).Error
-
-	return setting.Value, err
+func (r *Repository) DeactivateAllDoctorSettings(doctorID int) error {
+	return r.client.Model(&model.DoctorAISetting{}).
+		Where("doctor_id = ?", doctorID).
+		Update("is_active", false).Error
 }
 
-func (r *Repository) SetGlobalSetting(key string, value string) error {
-	var setting model.GlobalSetting
-	setting.Key = key
-	setting.Value = value
-	setting.UpdatedAt = time.Now()
+func (r *Repository) AdminUpdateDoctorSettings(doctorID int, isAIEnabled bool, allowGlobalAPI bool, useIndividualKey bool) error {
+	// First check if any rows exist for this doctor
+	var count int64
+	err := r.client.Model(&model.DoctorAISetting{}).Where("doctor_id = ?", doctorID).Count(&count).Error
+	if err != nil {
+		return err
+	}
 
-	return r.client.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "key"}},
-		DoUpdates: clause.AssignmentColumns([]string{"value", "updated_at"}),
-	}).Create(&setting).Error
+	if count == 0 {
+		// If no settings exist yet, create a default row for the doctor (using Gemini provider)
+		var gemini model.AIProvider
+		err = r.client.Model(&model.AIProvider{}).Where("slug = ?", "gemini").First(&gemini).Error
+		if err == nil {
+			defaultSetting := model.DoctorAISetting{
+				DoctorID:         doctorID,
+				AIProvidersID:    gemini.ID,
+				IsActive:         true,
+				IsAIEnabled:      isAIEnabled,
+				AllowGlobalAPI:   allowGlobalAPI,
+				UseIndividualKey: useIndividualKey,
+				CreatedAt:        time.Now(),
+				UpdatedAt:        time.Now(),
+			}
+
+			return r.client.Create(&defaultSetting).Error
+		}
+	}
+
+	// Update all existing rows
+	return r.client.Model(&model.DoctorAISetting{}).
+		Where("doctor_id = ?", doctorID).
+		Updates(map[string]interface{}{
+			"is_ai_enabled":      isAIEnabled,
+			"allow_global_api":   allowGlobalAPI,
+			"use_individual_key": useIndividualKey,
+			"updated_at":         time.Now(),
+		}).Error
+}
+
+func (r *Repository) GetProviders() ([]model.AIProvider, error) {
+	var providers []model.AIProvider
+	err := r.client.Model(&model.AIProvider{}).Order("id asc").Find(&providers).Error
+
+	return providers, err
+}
+
+func (r *Repository) UpdateProviders(providers []model.AIProvider) error {
+	return r.client.Transaction(func(tx *gorm.DB) error {
+		for _, p := range providers {
+			p.UpdatedAt = time.Now()
+			err := tx.Model(&model.AIProvider{}).
+				Clauses(clause.OnConflict{
+					Columns:   []clause.Column{{Name: "slug"}},
+					DoUpdates: clause.AssignmentColumns([]string{"name", "api_key", "model", "is_active", "updated_at"}),
+				}).Create(&p).Error
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+}
+
+func (r *Repository) GetProviderByID(id int) (model.AIProvider, error) {
+	var provider model.AIProvider
+	err := r.client.Model(&model.AIProvider{}).Where("id = ?", id).First(&provider).Error
+
+	return provider, err
+}
+
+func (r *Repository) GetProviderBySlug(slug string) (model.AIProvider, error) {
+	var provider model.AIProvider
+	err := r.client.Model(&model.AIProvider{}).Where("slug = ?", slug).First(&provider).Error
+
+	return provider, err
 }

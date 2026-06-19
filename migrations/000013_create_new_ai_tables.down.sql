@@ -1,0 +1,22 @@
+DROP TABLE IF EXISTS doctor_ai_settings CASCADE;
+DROP TABLE IF EXISTS ai_providers CASCADE;
+
+-- Recreate legacy tables
+CREATE TABLE IF NOT EXISTS global_settings (
+    key VARCHAR(255) PRIMARY KEY,
+    value TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ai_settings (
+    id SERIAL PRIMARY KEY,
+    doctor_id INT NOT NULL UNIQUE REFERENCES doctors(id) ON DELETE CASCADE,
+    is_ai_enabled BOOLEAN DEFAULT FALSE,
+    allow_global_api BOOLEAN DEFAULT FALSE,
+    provider VARCHAR(50) DEFAULT 'gemini',
+    individual_api_key VARCHAR(255),
+    use_individual_key BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

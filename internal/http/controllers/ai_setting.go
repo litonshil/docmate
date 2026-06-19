@@ -69,8 +69,7 @@ func (c *AISuggestionController) UpsertSettings(echoCtx echo.Context) error {
 		resp := types.AISettingResp{
 			IsAIEnabled:      true,
 			AllowGlobalAPI:   true,
-			Provider:         req.Provider,
-			IndividualAPIKey: req.IndividualAPIKey,
+			AIProviderID:     req.AIProviderID,
 			UseIndividualKey: req.UseIndividualKey,
 		}
 
@@ -146,7 +145,8 @@ func (c *AISuggestionController) GetSettings(echoCtx echo.Context) error {
 		resp := types.AISettingResp{
 			IsAIEnabled:      true,
 			AllowGlobalAPI:   true,
-			Provider:         "gemini",
+			AIProviderID:     1,
+			ProviderSlug:     "gemini",
 			UseIndividualKey: false,
 		}
 
@@ -169,47 +169,25 @@ func (c *AISuggestionController) GetSettings(echoCtx echo.Context) error {
 func (c *AISuggestionController) GetGlobalSettings(echoCtx echo.Context) error {
 	ctx := echoCtx.Request().Context()
 
-	keyVal, err := c.svc.GetGlobalSetting(ctx, "ai_global_api_key")
+	providers, err := c.svc.GetProviders(ctx)
 	if err != nil {
 		return response.InternalServerError(echoCtx, err.Error())
 	}
 
-	providerVal, err := c.svc.GetGlobalSetting(ctx, "ai_global_provider")
-	if err != nil {
-		return response.InternalServerError(echoCtx, err.Error())
-	}
-
-	// Default to gemini if providerVal is empty
-	if providerVal == "" {
-		providerVal = "gemini"
-	}
-
-	return response.Success(echoCtx, "global settings fetched successfully", map[string]string{
-		"ai_global_api_key":  keyVal,
-		"ai_global_provider": providerVal,
-	})
+	return response.Success(echoCtx, "global settings fetched successfully", providers)
 }
 
 func (c *AISuggestionController) UpdateGlobalSettings(echoCtx echo.Context) error {
 	ctx := echoCtx.Request().Context()
 
-	var req map[string]string
+	var req []types.AIProviderConfig
 	if err := echoCtx.Bind(&req); err != nil {
 		return response.BadRequest(echoCtx, err.Error())
 	}
 
-	if keyVal, ok := req["ai_global_api_key"]; ok {
-		err := c.svc.SetGlobalSetting(ctx, "ai_global_api_key", keyVal)
-		if err != nil {
-			return response.InternalServerError(echoCtx, err.Error())
-		}
-	}
-
-	if providerVal, ok := req["ai_global_provider"]; ok {
-		err := c.svc.SetGlobalSetting(ctx, "ai_global_provider", providerVal)
-		if err != nil {
-			return response.InternalServerError(echoCtx, err.Error())
-		}
+	err := c.svc.UpdateProviders(ctx, req)
+	if err != nil {
+		return response.InternalServerError(echoCtx, err.Error())
 	}
 
 	return response.Success(echoCtx, "global settings updated successfully", nil)

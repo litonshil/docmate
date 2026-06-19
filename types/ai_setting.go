@@ -2,23 +2,40 @@ package types
 
 import "time"
 
+type AIProviderConfig struct {
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Slug     string `json:"slug"`
+	APIKey   string `json:"api_key"`
+	Model    string `json:"model"`
+	IsActive bool   `json:"is_active"`
+}
+
+type ActiveProviderInfo struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
 type AISettingReq struct {
-	DoctorID         int    `json:"doctor_id"`
-	Provider         string `json:"provider"`
-	IndividualAPIKey string `json:"individual_api_key"`
-	UseIndividualKey bool   `json:"use_individual_key"`
+	DoctorID         int               `json:"doctor_id"`
+	AIProviderID     int               `json:"ai_provider_id"`
+	UseIndividualKey bool              `json:"use_individual_key"`
+	ProviderKeys     map[string]string `json:"provider_keys"`
 }
 
 type AISettingResp struct {
-	ID               int       `json:"id"`
-	DoctorID         int       `json:"doctor_id"`
-	IsAIEnabled      bool      `json:"is_ai_enabled"`
-	AllowGlobalAPI   bool      `json:"allow_global_api"`
-	Provider         string    `json:"provider"`
-	IndividualAPIKey string    `json:"individual_api_key,omitempty"`
-	UseIndividualKey bool      `json:"use_individual_key"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	ID               int                  `json:"id"`
+	DoctorID         int                  `json:"doctor_id"`
+	IsAIEnabled      bool                 `json:"is_ai_enabled"`
+	AllowGlobalAPI   bool                 `json:"allow_global_api"`
+	AIProviderID     int                  `json:"ai_provider_id"`
+	ProviderSlug     string               `json:"provider_slug"`
+	UseIndividualKey bool                 `json:"use_individual_key"`
+	ProviderKeys     map[string]string    `json:"provider_keys"`
+	ActiveProviders  []ActiveProviderInfo `json:"active_providers"`
+	CreatedAt        time.Time            `json:"created_at"`
+	UpdatedAt        time.Time            `json:"updated_at"`
 }
 
 type AISuggestionReq struct {
@@ -36,13 +53,4 @@ type AdminAISettingUpdateReq struct {
 	IsAIEnabled      bool `json:"is_ai_enabled"`
 	AllowGlobalAPI   bool `json:"allow_global_api"`
 	UseIndividualKey bool `json:"use_individual_key"`
-}
-
-type GlobalSettingReq struct {
-	Value string `json:"value"`
-}
-
-type GlobalSettingResp struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
 }

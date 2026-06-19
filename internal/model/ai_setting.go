@@ -6,17 +6,36 @@ import (
 	"time"
 )
 
-type AISetting struct {
-	ID               int        `json:"id" gorm:"primaryKey"`
-	DoctorID         int        `json:"doctor_id" gorm:"uniqueIndex"`
-	IsAIEnabled      bool       `json:"is_ai_enabled"`
-	AllowGlobalAPI   bool       `json:"allow_global_api"`
-	Provider         string     `json:"provider"`
-	IndividualAPIKey string     `json:"individual_api_key"`
-	UseIndividualKey bool       `json:"use_individual_key"`
-	CreatedAt        time.Time  `json:"created_at"`
-	UpdatedAt        time.Time  `json:"updated_at"`
-	DeletedAt        *time.Time `json:"deleted_at"`
+type AIProvider struct {
+	ID        int       `json:"id" gorm:"primaryKey;column:id"`
+	Name      string    `json:"name" gorm:"column:name"`
+	Slug      string    `json:"slug" gorm:"column:slug;unique"`
+	APIKey    string    `json:"api_key" gorm:"column:api_key"`
+	Model     string    `json:"model" gorm:"column:model"`
+	IsActive  bool      `json:"is_active" gorm:"column:is_active"`
+	CreatedAt time.Time `json:"created_at" gorm:"column:created_at"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"column:updated_at"`
+}
+
+func (AIProvider) TableName() string {
+	return "ai_providers"
+}
+
+type DoctorAISetting struct {
+	ID               int       `json:"id" gorm:"primaryKey;column:id"`
+	DoctorID         int       `json:"doctor_id" gorm:"column:doctor_id;uniqueIndex:idx_doc_provider"`
+	AIProvidersID    int       `json:"ai_providers_id" gorm:"column:ai_providers_id;uniqueIndex:idx_doc_provider"`
+	IndividualAPIKey string    `json:"individual_api_key" gorm:"column:individual_api_key"`
+	IsActive         bool      `json:"is_active" gorm:"column:is_active"`
+	IsAIEnabled      bool      `json:"is_ai_enabled" gorm:"column:is_ai_enabled"`
+	AllowGlobalAPI   bool      `json:"allow_global_api" gorm:"column:allow_global_api"`
+	UseIndividualKey bool      `json:"use_individual_key" gorm:"column:use_individual_key"`
+	CreatedAt        time.Time `json:"created_at" gorm:"column:created_at"`
+	UpdatedAt        time.Time `json:"updated_at" gorm:"column:updated_at"`
+}
+
+func (DoctorAISetting) TableName() string {
+	return "doctor_ai_settings"
 }
 
 type AISettingUseCase interface {
@@ -24,14 +43,20 @@ type AISettingUseCase interface {
 	AdminUpdate(ctx context.Context, req types.AdminAISettingUpdateReq) (types.AISettingResp, error)
 	GetByDoctor(ctx context.Context, doctorID int) (types.AISettingResp, error)
 	GetSuggestions(ctx context.Context, doctorID int, complaints []string) (*types.AISuggestionResp, error)
-	GetGlobalSetting(ctx context.Context, key string) (string, error)
-	SetGlobalSetting(ctx context.Context, key string, value string) error
+
+	GetProviders(ctx context.Context) ([]types.AIProviderConfig, error)
+	UpdateProviders(ctx context.Context, req []types.AIProviderConfig) error
+	GetActiveProviders(ctx context.Context) ([]string, error)
 }
 
 type AISettingRepo interface {
-	UpsertAISetting(setting AISetting) (AISetting, error)
-	AdminUpdateAISetting(setting AISetting) (AISetting, error)
-	GetAISettingByDoctor(doctorID int) (AISetting, error)
-	GetGlobalSetting(key string) (string, error)
-	SetGlobalSetting(key string, value string) error
+	GetDoctorSettings(doctorID int) ([]DoctorAISetting, error)
+	UpsertDoctorSetting(setting DoctorAISetting) (DoctorAISetting, error)
+	DeactivateAllDoctorSettings(doctorID int) error
+	AdminUpdateDoctorSettings(doctorID int, isAIEnabled bool, allowGlobalAPI bool, useIndividualKey bool) error
+
+	GetProviders() ([]AIProvider, error)
+	UpdateProviders(providers []AIProvider) error
+	GetProviderByID(id int) (AIProvider, error)
+	GetProviderBySlug(slug string) (AIProvider, error)
 }
