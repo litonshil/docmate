@@ -24,7 +24,7 @@ func (req PatientReq) Validate() error {
 		validation.Field(&req.FullName, validation.Required, validation.Length(2, 150)),
 		validation.Field(&req.Gender, validation.Required, validation.In("male", "female", "other")),
 		validation.Field(&req.Age, validation.Required, validation.Min(0), validation.Max(150)),
-		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^\d{11}$`)).Error("phone must be exactly 11 digits")),
+		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^[0-9]{11}$`)).Error("phone must be exactly 11 digits")),
 		validation.Field(&req.Email, is.Email),
 		validation.Field(&req.BloodGroup, validation.In("", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")),
 	)
@@ -48,7 +48,7 @@ func (req PatientUpdateReq) Validate() error {
 		validation.Field(&req.FullName, validation.Required, validation.Length(2, 150)),
 		validation.Field(&req.Gender, validation.Required, validation.In("male", "female", "other")),
 		validation.Field(&req.Age, validation.Required, validation.Min(0), validation.Max(150)),
-		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^\d{11}$`)).Error("phone must be exactly 11 digits")),
+		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^[0-9]{11}$`)).Error("phone must be exactly 11 digits")),
 		validation.Field(&req.Email, is.Email),
 		validation.Field(&req.BloodGroup, validation.In("", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-")),
 	)

@@ -39,7 +39,7 @@ type QuickPatient struct {
 func (q QuickPatient) Validate() error {
 	return validation.ValidateStruct(&q,
 		validation.Field(&q.FullName, validation.Required, validation.Length(2, 100)),
-		validation.Field(&q.Phone, validation.Required, validation.Match(regexp.MustCompile(`^\d{11}$`)).Error("phone must be exactly 11 digits")),
+		validation.Field(&q.Phone, validation.Required, validation.Match(regexp.MustCompile(`^[0-9]{11}$`)).Error("phone must be exactly 11 digits")),
 		validation.Field(&q.Gender, validation.Required, validation.In("male", "female", "other")),
 		validation.Field(&q.Age, validation.Required, validation.Min(0), validation.Max(120)),
 	)
