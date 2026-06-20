@@ -192,3 +192,39 @@ func (controller *ChamberController) List(c echo.Context) error {
 
 	return response.Success(c, "chambers fetched successfully", resp)
 }
+
+func (controller *ChamberController) Delete(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var filter types.ChamberFilter
+	if err := c.Bind(&filter); err != nil {
+		return response.BadRequest(c, "invalid parameters")
+	}
+
+	if err := filter.Validate(); err != nil {
+		return response.BadRequest(c, err.Error())
+	}
+
+	// 1. Get existing chamber to verify existence and doctor association
+	existing, err := controller.chamberSvc.Get(ctx, filter)
+	if err != nil {
+		return response.NotFound(c, "chamber not found")
+	}
+
+	// Verify that the chamber belongs to the doctor in the URL
+	if existing.DoctorID != filter.DoctorID {
+		return response.BadRequest(c, "chamber does not belong to this doctor")
+	}
+
+	// 2. Authorize (Owner or Admin)
+	if err := controller.authorizeDoctor(c, existing.DoctorID); err != nil {
+		return err
+	}
+
+	// 3. Delete
+	if err := controller.chamberSvc.Delete(ctx, filter.ID); err != nil {
+		return response.InternalServerError(c, err.Error())
+	}
+
+	return response.Success(c, "chamber deleted successfully", nil)
+}

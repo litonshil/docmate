@@ -32,6 +32,7 @@ type ChamberUseCase interface {
 	Get(ctx context.Context, filter types.ChamberFilter) (types.ChamberResp, error)
 	Update(ctx context.Context, req types.ChamberUpdateReq) (types.ChamberResp, error)
 	List(ctx context.Context, req types.ChamberListReq) (types.PaginatedResponse[types.ChamberResp], error)
+	Delete(ctx context.Context, id int) error
 }
 
 type ChamberRepo interface {
@@ -39,4 +40,5 @@ type ChamberRepo interface {
 	UpdateChamber(chamber Chamber) (Chamber, error)
 	GetChamberByID(id int) (Chamber, error)
 	ListChambers(offset, limit, doctorID int) ([]Chamber, int64, error)
+	DeleteChamber(id int) error
 }

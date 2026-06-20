@@ -1,6 +1,7 @@
 package types
 
 import (
+	"regexp"
 	"time"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -39,7 +40,7 @@ func (req ChamberReq) Validate() error {
 		validation.Field(&req.Address, validation.Required, validation.Length(2, 500)),
 		validation.Field(&req.City, validation.Required, validation.Length(2, 100)),
 		validation.Field(&req.Country, validation.Length(2, 100)),
-		validation.Field(&req.Phone, validation.Length(5, 20)),
+		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^[0-9]{11}$`)).Error("phone must be exactly 11 digits")),
 		validation.Field(&req.Email, is.Email),
 		validation.Field(&req.Fee, validation.Required, validation.Min(0.0)),
 	)
@@ -69,7 +70,7 @@ func (req ChamberUpdateReq) Validate() error {
 		validation.Field(&req.Address, validation.Length(2, 500)),
 		validation.Field(&req.City, validation.Length(2, 100)),
 		validation.Field(&req.Country, validation.Length(2, 100)),
-		validation.Field(&req.Phone, validation.Length(5, 20)),
+		validation.Field(&req.Phone, validation.Required, validation.Match(regexp.MustCompile(`^[0-9]{11}$`)).Error("phone must be exactly 11 digits")),
 		validation.Field(&req.Email, is.Email),
 		validation.Field(&req.Fee, validation.Min(0.0)),
 	)

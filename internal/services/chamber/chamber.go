@@ -133,6 +133,17 @@ func (service *Service) List(ctx context.Context, req types.ChamberListReq) (typ
 	}, nil
 }
 
+func (service *Service) Delete(ctx context.Context, id int) error {
+	err := service.chamberRepo.DeleteChamber(id)
+	if err != nil {
+		slog.Error("failed to delete chamber", "error", err.Error())
+
+		return err
+	}
+
+	return nil
+}
+
 func mapToChamberResponse(chamber model.Chamber) types.ChamberResp {
 	var visitingHours []types.VisitingDay
 	if len(chamber.VisitingHours) > 0 {

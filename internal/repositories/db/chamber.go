@@ -46,3 +46,7 @@ func (r *Repository) ListChambers(offset, limit, doctorID int) ([]model.Chamber,
 
 	return chambers, total, nil
 }
+
+func (r *Repository) DeleteChamber(id int) error {
+	return r.client.Delete(&model.Chamber{}, id).Error
+}

@@ -91,6 +91,7 @@ func (r *Routes) Init() {
 		chambers.POST("", r.chamberController.Create)
 		chambers.GET("/:id", r.chamberController.Get)
 		chambers.PUT("/:id", r.chamberController.Update)
+		chambers.DELETE("/:id", r.chamberController.Delete)
 	}
 
 	globalChambers := v1.Group("/chambers", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
