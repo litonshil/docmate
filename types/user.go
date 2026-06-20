@@ -74,7 +74,7 @@ func (ur UserReq) Validate() error {
 		// ID is mandatory
 		validation.Field(&ur.UserName, validation.Required),
 		validation.Field(&ur.Email, validation.Required),
-		validation.Field(&ur.Password, validation.Required),
+		validation.Field(&ur.Password, validation.Required, validation.Length(8, 100).Error("password must be at least 8 characters")),
 	)
 }
 
