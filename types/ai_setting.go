@@ -33,6 +33,7 @@ type AISettingResp struct {
 	AIProviderID     int                  `json:"ai_provider_id"`
 	ProviderSlug     string               `json:"provider_slug"`
 	UseIndividualKey bool                 `json:"use_individual_key"`
+	AIRequestStatus  *string              `json:"ai_request_status"`
 	ProviderKeys     map[string]string    `json:"provider_keys"`
 	ActiveProviders  []ActiveProviderInfo `json:"active_providers"`
 	CreatedAt        time.Time            `json:"created_at"`
@@ -50,8 +51,9 @@ type AISuggestionResp struct {
 }
 
 type AdminAISettingUpdateReq struct {
-	DoctorID         int  `json:"doctor_id"`
-	IsAIEnabled      bool `json:"is_ai_enabled"`
-	AllowGlobalAPI   bool `json:"allow_global_api"`
-	UseIndividualKey bool `json:"use_individual_key"`
+	DoctorID         int     `json:"doctor_id"`
+	IsAIEnabled      bool    `json:"is_ai_enabled"`
+	AllowGlobalAPI   bool    `json:"allow_global_api"`
+	UseIndividualKey bool    `json:"use_individual_key"`
+	AIRequestStatus  *string `json:"ai_request_status"`
 }

@@ -9,18 +9,20 @@ import (
 )
 
 type Doctor struct {
-	ID             int            `json:"id"`
-	UserID         int            `json:"user_id"`
-	Email          string         `json:"email"`
-	FullName       string         `json:"full_name"`
-	Degree         datatypes.JSON `json:"degree" gorm:"type:jsonb"`
-	Specialization datatypes.JSON `json:"specialization" gorm:"type:jsonb"`
-	Phone          string         `json:"phone"`
-	Bio            string         `json:"bio"`
-	SignatureURL   string         `json:"signature_url"`
-	CreatedAt      time.Time      `json:"created_at"`
-	UpdatedAt      *time.Time     `json:"updated_at"`
-	DeletedAt      *time.Time     `json:"deleted_at"`
+	ID              int            `json:"id"`
+	UserID          int            `json:"user_id"`
+	Email           string         `json:"email"`
+	FullName        string         `json:"full_name"`
+	Degree          datatypes.JSON `json:"degree" gorm:"type:jsonb"`
+	Specialization  datatypes.JSON `json:"specialization" gorm:"type:jsonb"`
+	Phone           string         `json:"phone"`
+	Bio             string         `json:"bio"`
+	SignatureURL    string         `json:"signature_url"`
+	AIRequestStatus *string        `json:"ai_request_status" gorm:"->"`
+	IsAIEnabled     bool           `json:"is_ai_enabled" gorm:"->"`
+	CreatedAt       time.Time      `json:"created_at"`
+	UpdatedAt       *time.Time     `json:"updated_at"`
+	DeletedAt       *time.Time     `json:"deleted_at"`
 }
 
 type DoctorUseCase interface {

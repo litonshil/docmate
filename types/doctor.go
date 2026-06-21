@@ -48,17 +48,19 @@ func (req DoctorUpdateReq) Validate() error {
 }
 
 type DoctorResp struct {
-	ID             int        `json:"id"`
-	UserID         int        `json:"user_id"`
-	Email          string     `json:"email"`
-	FullName       string     `json:"full_name"`
-	Degree         []string   `json:"degree"`
-	Specialization []string   `json:"specialization"`
-	Phone          string     `json:"phone"`
-	Bio            string     `json:"bio"`
-	SignatureURL   string     `json:"signature_url"`
-	CreatedAt      time.Time  `json:"created_at"`
-	UpdatedAt      *time.Time `json:"updated_at"`
+	ID              int        `json:"id"`
+	UserID          int        `json:"user_id"`
+	Email           string     `json:"email"`
+	FullName        string     `json:"full_name"`
+	Degree          []string   `json:"degree"`
+	Specialization  []string   `json:"specialization"`
+	Phone           string     `json:"phone"`
+	Bio             string     `json:"bio"`
+	SignatureURL    string     `json:"signature_url"`
+	AIRequestStatus *string    `json:"ai_request_status"`
+	IsAIEnabled     bool       `json:"is_ai_enabled"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       *time.Time `json:"updated_at"`
 }
 
 type DoctorListReq struct {

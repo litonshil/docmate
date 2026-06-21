@@ -192,3 +192,23 @@ func (c *AISuggestionController) UpdateGlobalSettings(echoCtx echo.Context) erro
 
 	return response.Success(echoCtx, "global settings updated successfully", nil)
 }
+
+func (c *AISuggestionController) RequestActivation(echoCtx echo.Context) error {
+	ctx := echoCtx.Request().Context()
+	user, err := contextutil.GetUserFromContext(echoCtx)
+	if err != nil {
+		return response.Unauthorized(echoCtx, "Unauthorized")
+	}
+
+	doc, err := c.docRepo.GetDoctorByUserID(user.ID)
+	if err != nil {
+		return response.BadRequest(echoCtx, "doctor profile not found")
+	}
+
+	resp, err := c.svc.RequestActivation(ctx, doc.ID)
+	if err != nil {
+		return response.InternalServerError(echoCtx, err.Error())
+	}
+
+	return response.Success(echoCtx, "activation requested successfully", resp)
+}

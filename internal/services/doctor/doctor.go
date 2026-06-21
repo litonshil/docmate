@@ -135,16 +135,18 @@ func mapToDoctorResponse(doc model.Doctor) types.DoctorResp {
 	_ = json.Unmarshal(doc.Specialization, &specialization)
 
 	return types.DoctorResp{
-		ID:             doc.ID,
-		UserID:         doc.UserID,
-		Email:          doc.Email,
-		FullName:       doc.FullName,
-		Degree:         degree,
-		Specialization: specialization,
-		Phone:          doc.Phone,
-		Bio:            doc.Bio,
-		SignatureURL:   doc.SignatureURL,
-		CreatedAt:      doc.CreatedAt,
-		UpdatedAt:      doc.UpdatedAt,
+		ID:              doc.ID,
+		UserID:          doc.UserID,
+		Email:           doc.Email,
+		FullName:        doc.FullName,
+		Degree:          degree,
+		Specialization:  specialization,
+		Phone:           doc.Phone,
+		Bio:             doc.Bio,
+		SignatureURL:    doc.SignatureURL,
+		CreatedAt:       doc.CreatedAt,
+		UpdatedAt:       doc.UpdatedAt,
+		AIRequestStatus: doc.AIRequestStatus,
+		IsAIEnabled:     doc.IsAIEnabled,
 	}
 }

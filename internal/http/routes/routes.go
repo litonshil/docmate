@@ -145,6 +145,7 @@ func (r *Routes) Init() {
 	{
 		aiSettings.GET("", r.aiSettingController.GetSettings)
 		aiSettings.POST("", r.aiSettingController.UpsertSettings)
+		aiSettings.POST("/request", r.aiSettingController.RequestActivation, middlewares.AuthRoles(consts.RoleDoctor))
 		aiSettings.GET("/global", r.aiSettingController.GetGlobalSettings, middlewares.AuthRoles(consts.RoleAdmin))
 		aiSettings.POST("/global", r.aiSettingController.UpdateGlobalSettings, middlewares.AuthRoles(consts.RoleAdmin))
 	}

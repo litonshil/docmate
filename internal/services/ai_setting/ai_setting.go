@@ -98,7 +98,7 @@ func (s *Service) Upsert(ctx context.Context, req types.AISettingReq) (types.AIS
 }
 
 func (s *Service) AdminUpdate(ctx context.Context, req types.AdminAISettingUpdateReq) (types.AISettingResp, error) {
-	err := s.repo.AdminUpdateDoctorSettings(req.DoctorID, req.IsAIEnabled, req.AllowGlobalAPI, req.UseIndividualKey)
+	err := s.repo.AdminUpdateDoctorSettings(req.DoctorID, req.IsAIEnabled, req.AllowGlobalAPI, req.UseIndividualKey, req.AIRequestStatus)
 	if err != nil {
 		slog.Error("failed to admin update doctor settings", "error", err.Error())
 
@@ -106,6 +106,17 @@ func (s *Service) AdminUpdate(ctx context.Context, req types.AdminAISettingUpdat
 	}
 
 	return s.GetByDoctor(ctx, req.DoctorID)
+}
+
+func (s *Service) RequestActivation(ctx context.Context, doctorID int) (types.AISettingResp, error) {
+	err := s.repo.UpdateAIRequestStatus(doctorID, "pending")
+	if err != nil {
+		slog.Error("failed to request AI activation", "error", err.Error())
+
+		return types.AISettingResp{}, err
+	}
+
+	return s.GetByDoctor(ctx, doctorID)
 }
 
 func (s *Service) GetByDoctor(ctx context.Context, doctorID int) (types.AISettingResp, error) {
@@ -170,6 +181,7 @@ func (s *Service) GetByDoctor(ctx context.Context, doctorID int) (types.AISettin
 			UseIndividualKey: false,
 			AIProviderID:     defaultProviderID,
 			ProviderSlug:     defaultProviderSlug,
+			AIRequestStatus:  nil,
 			ProviderKeys:     keys,
 			ActiveProviders:  activeProviders,
 		}, nil
@@ -188,6 +200,7 @@ func (s *Service) GetByDoctor(ctx context.Context, doctorID int) (types.AISettin
 		AIProviderID:     activeSetting.AIProvidersID,
 		ProviderSlug:     pSlug,
 		UseIndividualKey: activeSetting.UseIndividualKey,
+		AIRequestStatus:  activeSetting.AIRequestStatus,
 		ProviderKeys:     keys,
 		ActiveProviders:  activeProviders,
 		CreatedAt:        activeSetting.CreatedAt,

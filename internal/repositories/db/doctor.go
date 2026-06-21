@@ -36,7 +36,15 @@ func (r *Repository) ListDoctors(offset, limit int) ([]model.Doctor, int64, erro
 		return nil, 0, err
 	}
 
-	if err := r.client.Model(&model.Doctor{}).Offset(offset).Limit(limit).Find(&doctors).Error; err != nil {
+	err := r.client.Model(&model.Doctor{}).
+		Select("doctors.*, ai.ai_request_status, COALESCE(ai.is_ai_enabled, false) as is_ai_enabled").
+		Joins("LEFT JOIN (SELECT doctor_id, MAX(ai_request_status) as ai_request_status, MAX(CASE WHEN is_ai_enabled = true THEN 1 ELSE 0 END) = 1 as is_ai_enabled FROM doctor_ai_settings GROUP BY doctor_id) ai ON ai.doctor_id = doctors.id").
+		Offset(offset).
+		Limit(limit).
+		Order("doctors.id desc").
+		Find(&doctors).Error
+
+	if err != nil {
 		return nil, 0, err
 	}
 
