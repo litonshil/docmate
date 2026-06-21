@@ -8,6 +8,7 @@ import (
 	"docmate/types"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -27,6 +28,11 @@ func NewService(userRepo model.UserRepo, doctorRepo model.DoctorRepo) *Service {
 }
 
 func (service *Service) Create(ctx context.Context, req types.UserReq) (types.UserResp, error) {
+	// Proactively check if a user with this email already exists
+	if existingUser, err := service.userRepo.GetByEmail(req.Email); err == nil && existingUser.ID != 0 {
+		return types.UserResp{}, fmt.Errorf("user with this email already exists")
+	}
+
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return types.UserResp{}, err
@@ -41,6 +47,12 @@ func (service *Service) Create(ctx context.Context, req types.UserReq) (types.Us
 	user, err := service.userRepo.Create(payload)
 	if err != nil {
 		slog.Error("failed to create user", "error", err.Error())
+
+		// Fallback check: Map any database unique constraint violations to a clean message
+		errMsg := err.Error()
+		if strings.Contains(errMsg, "duplicate key") || strings.Contains(errMsg, "unique constraint") || strings.Contains(errMsg, "UNIQUE constraint") {
+			return types.UserResp{}, fmt.Errorf("user with this email already exists")
+		}
 
 		return types.UserResp{}, err
 	}

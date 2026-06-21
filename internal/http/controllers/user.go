@@ -38,6 +38,10 @@ func (controller *UserController) Create(c echo.Context) error {
 
 	resp, err := controller.userSvc.Create(ctx, req)
 	if err != nil {
+		if err.Error() == "user with this email already exists" {
+			return response.Error(c, http.StatusConflict, err.Error(), nil)
+		}
+
 		return response.InternalServerError(c, err.Error())
 	}
 

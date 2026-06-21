@@ -2,7 +2,9 @@ package response
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -64,7 +66,29 @@ func NotFound(c echo.Context, message string) error {
 	return Error(c, http.StatusNotFound, message, nil)
 }
 
-// InternalServerError sends a 500 Internal Server Error response.
+// InternalServerError sends a 500 Internal Server Error response, sanitizing database/driver errors to protect server internals.
 func InternalServerError(c echo.Context, message string) error {
-	return Error(c, http.StatusInternalServerError, message, nil)
+	slog.Error("internal server error occurred", "error", message)
+
+	sanitizedMsg := sanitizeErrorMessage(message)
+
+	return Error(c, http.StatusInternalServerError, sanitizedMsg, nil)
+}
+
+// sanitizeErrorMessage hides database/system-level details in HTTP 500 responses.
+func sanitizeErrorMessage(message string) string {
+	lowerMsg := strings.ToLower(message)
+	dbKeywords := []string{
+		"sql:", "gorm", "postgres", "pq:", "pgconn", "connection", "dial tcp",
+		"database", "rows", "scan", "tx", "transaction", "driver", "query",
+		"column", "table", "relation", "syntax", "violation", "duplicate key",
+		"constraint", "schema", "db client", "record not found",
+	}
+	for _, kw := range dbKeywords {
+		if strings.Contains(lowerMsg, kw) {
+			return "Something went wrong. Please try again later."
+		}
+	}
+
+	return message
 }
