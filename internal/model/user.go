@@ -30,6 +30,7 @@ type UserUseCase interface {
 
 type UserRepo interface {
 	Create(req User) (User, error)
+	Update(req User) (User, error)
 	Get(userID int) (User, error)
 	GetByEmail(email string) (User, error)
 	List(offset, limit int) ([]User, int64, error)

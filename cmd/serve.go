@@ -12,6 +12,7 @@ import (
 	"docmate/internal/repositories/db"
 	aisettingservice "docmate/internal/services/ai_setting"
 	appointmentservice "docmate/internal/services/appointment"
+	assistantservice "docmate/internal/services/assistant"
 	chamberservice "docmate/internal/services/chamber"
 	dashboardservice "docmate/internal/services/dashboard"
 	doctorservice "docmate/internal/services/doctor"
@@ -55,6 +56,7 @@ func MountRoutes(ctx context.Context, e *echo.Echo) {
 	medicinesvc := medicineservice.NewService(dbRepo)
 	prescriptionsvc := prescriptionservice.NewService(dbRepo)
 	prescriptionsettingsvc := prescriptionsettingservice.NewService(dbRepo)
+	assistantsvc := assistantservice.NewService(dbRepo, dbRepo, dbRepo)
 
 	llmFactory := llm.NewFactory()
 	aisettingsvc := aisettingservice.NewService(dbRepo, llmFactory)
@@ -67,16 +69,17 @@ func MountRoutes(ctx context.Context, e *echo.Echo) {
 
 	userController := controllers.NewUserController(ctx, usersvc)
 	doctorController := controllers.NewDoctorController(ctx, doctorsvc)
-	patientController := controllers.NewPatientController(ctx, patientsvc, dbRepo)
-	chamberController := controllers.NewChamberController(ctx, chambersvc, dbRepo)
+	patientController := controllers.NewPatientController(ctx, patientsvc, dbRepo, dbRepo)
+	chamberController := controllers.NewChamberController(ctx, chambersvc, dbRepo, dbRepo)
 	medicineController := controllers.NewMedicineController(ctx, medicinesvc)
 	prescriptionController := controllers.NewPrescriptionController(ctx, prescriptionsvc, dbRepo)
 	prescriptionSettingController := controllers.NewPrescriptionSettingController(prescriptionsettingsvc, dbRepo)
-	dashboardController := controllers.NewDashboardController(ctx, dashboardsvc, dbRepo)
+	dashboardController := controllers.NewDashboardController(ctx, dashboardsvc, dbRepo, dbRepo)
 	aiSettingController := controllers.NewAISuggestionController(ctx, aisettingsvc, dbRepo)
-	appointmentController := controllers.NewAppointmentController(appointmentsvc, dbRepo)
+	appointmentController := controllers.NewAppointmentController(appointmentsvc, dbRepo, dbRepo)
+	assistantController := controllers.NewAssistantController(ctx, assistantsvc, dbRepo)
 
-	routes := httpRoutes.New(e, userController, doctorController, patientController, chamberController, medicineController, prescriptionController, prescriptionSettingController, dashboardController, aiSettingController, appointmentController)
+	routes := httpRoutes.New(e, userController, doctorController, patientController, chamberController, medicineController, prescriptionController, prescriptionSettingController, dashboardController, aiSettingController, appointmentController, assistantController)
 	routes.Init()
 }
 

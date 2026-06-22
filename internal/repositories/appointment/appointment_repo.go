@@ -34,10 +34,14 @@ func (r *appointmentRepo) UpdateAppointmentFields(id int, updates map[string]int
 	return r.db.Model(&model.Appointment{}).Where("id = ?", id).Updates(updates).Error
 }
 
-func (r *appointmentRepo) ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]model.Appointment, int64, error) {
+func (r *appointmentRepo) ListAppointments(doctorID int, chamberIDs []int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]model.Appointment, int64, error) {
 	var appointments []model.Appointment
 	var total int64
 	query := r.db.Model(&model.Appointment{}).Where("doctor_id = ?", doctorID)
+
+	if len(chamberIDs) > 0 {
+		query = query.Where("chamber_id IN ?", chamberIDs)
+	}
 
 	if search != "" {
 		var patientIDs []int
@@ -72,9 +76,23 @@ func (r *appointmentRepo) ListAppointments(doctorID int, dateFrom, dateTo *time.
 		Where("appointments.doctor_id = ?", doctorID).
 		Preload("Patient").Preload("Chamber")
 
+	if len(chamberIDs) > 0 {
+		q = q.Where("appointments.chamber_id IN ?", chamberIDs)
+	}
+
 	if search != "" {
 		searchPattern := "%" + search + "%"
 		q = q.Where("(patients.full_name ILIKE ? OR patients.phone LIKE ?)", searchPattern, searchPattern)
+	}
+
+	if dateFrom != nil {
+		q = q.Where("appointments.appointment_date >= ?", dateFrom)
+	}
+	if dateTo != nil {
+		q = q.Where("appointments.appointment_date <= ?", dateTo)
+	}
+	if status != "" {
+		q = q.Where("appointments.status = ?", status)
 	}
 
 	if status == "pending" {

@@ -42,3 +42,9 @@ func (r *Repository) List(offset, limit int) ([]model.User, int64, error) {
 
 	return users, total, nil
 }
+
+func (r *Repository) Update(user model.User) (model.User, error) {
+	err := r.client.Save(&user).Error
+
+	return user, err
+}

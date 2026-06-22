@@ -13,20 +13,23 @@ import (
 )
 
 type PatientController struct {
-	baseCtx    context.Context
-	patientSvc model.PatientUseCase
-	doctorRepo model.DoctorRepo
+	baseCtx       context.Context
+	patientSvc    model.PatientUseCase
+	doctorRepo    model.DoctorRepo
+	assistantRepo model.AssistantRepo
 }
 
 func NewPatientController(
 	baseCtx context.Context,
 	patientSvc model.PatientUseCase,
 	doctorRepo model.DoctorRepo,
+	assistantRepo model.AssistantRepo,
 ) *PatientController {
 	return &PatientController{
-		baseCtx:    baseCtx,
-		patientSvc: patientSvc,
-		doctorRepo: doctorRepo,
+		baseCtx:       baseCtx,
+		patientSvc:    patientSvc,
+		doctorRepo:    doctorRepo,
+		assistantRepo: assistantRepo,
 	}
 }
 
@@ -40,9 +43,24 @@ func (controller *PatientController) Create(c echo.Context) error {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
-	doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
-	if err != nil {
-		return response.BadRequest(c, "Doctor profile not found for user")
+	var doctorID int
+	if user.Role == consts.RoleDoctor {
+		doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Doctor profile not found for user")
+		}
+		doctorID = doctor.ID
+	} else if user.Role == consts.RoleAssistant {
+		assistant, err := controller.assistantRepo.GetAssistantByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Assistant profile not found")
+		}
+		if !assistant.IsActive {
+			return response.Forbidden(c, "Assistant account is inactive")
+		}
+		doctorID = assistant.DoctorID
+	} else {
+		return response.Forbidden(c, "Forbidden")
 	}
 
 	var req types.PatientReq
@@ -54,7 +72,7 @@ func (controller *PatientController) Create(c echo.Context) error {
 		return response.BadRequest(c, err.Error())
 	}
 
-	resp, err := controller.patientSvc.Create(ctx, req, doctor.ID)
+	resp, err := controller.patientSvc.Create(ctx, req, doctorID)
 	if err != nil {
 		return response.InternalServerError(c, err.Error())
 	}
@@ -69,9 +87,24 @@ func (controller *PatientController) Update(c echo.Context) error {
 		return response.Unauthorized(c, "Unauthorized")
 	}
 
-	doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
-	if err != nil {
-		return response.BadRequest(c, "Doctor profile not found for user")
+	var doctorID int
+	if user.Role == consts.RoleDoctor {
+		doctor, err := controller.doctorRepo.GetDoctorByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Doctor profile not found for user")
+		}
+		doctorID = doctor.ID
+	} else if user.Role == consts.RoleAssistant {
+		assistant, err := controller.assistantRepo.GetAssistantByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Assistant profile not found")
+		}
+		if !assistant.IsActive {
+			return response.Forbidden(c, "Assistant account is inactive")
+		}
+		doctorID = assistant.DoctorID
+	} else {
+		return response.Forbidden(c, "Forbidden")
 	}
 
 	var req types.PatientUpdateReq
@@ -91,7 +124,7 @@ func (controller *PatientController) Update(c echo.Context) error {
 	}
 
 	// 2. Verify Authorization (Owner)
-	if existing.DoctorID != doctor.ID {
+	if existing.DoctorID != doctorID {
 		return response.Unauthorized(c, "unauthorized to update this patient profile")
 	}
 
@@ -133,6 +166,17 @@ func (controller *PatientController) Get(c echo.Context) error {
 		if patient.DoctorID != doctor.ID {
 			return response.Unauthorized(c, "unauthorized to view this patient profile")
 		}
+	} else if user.Role == consts.RoleAssistant {
+		assistant, err := controller.assistantRepo.GetAssistantByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Assistant profile not found")
+		}
+		if !assistant.IsActive {
+			return response.Forbidden(c, "Assistant account is inactive")
+		}
+		if patient.DoctorID != assistant.DoctorID {
+			return response.Unauthorized(c, "unauthorized to view this patient profile")
+		}
 	} else if user.Role != consts.RoleAdmin {
 		return response.Forbidden(c, "Forbidden")
 	}
@@ -159,6 +203,15 @@ func (controller *PatientController) List(c echo.Context) error {
 			return response.BadRequest(c, "Doctor profile not found for user")
 		}
 		doctorID = doctor.ID
+	} else if user.Role == consts.RoleAssistant {
+		assistant, err := controller.assistantRepo.GetAssistantByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Assistant profile not found")
+		}
+		if !assistant.IsActive {
+			return response.Forbidden(c, "Assistant account is inactive")
+		}
+		doctorID = assistant.DoctorID
 	} else if user.Role == consts.RoleAdmin {
 		doctorID = req.DoctorID
 	} else {

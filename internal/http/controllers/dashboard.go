@@ -11,20 +11,23 @@ import (
 )
 
 type DashboardController struct {
-	baseCtx      context.Context
-	dashboardSvc model.DashboardUseCase
-	doctorRepo   model.DoctorRepo
+	baseCtx       context.Context
+	dashboardSvc  model.DashboardUseCase
+	doctorRepo    model.DoctorRepo
+	assistantRepo model.AssistantRepo
 }
 
 func NewDashboardController(
 	baseCtx context.Context,
 	dashboardSvc model.DashboardUseCase,
 	doctorRepo model.DoctorRepo,
+	assistantRepo model.AssistantRepo,
 ) *DashboardController {
 	return &DashboardController{
-		baseCtx:      baseCtx,
-		dashboardSvc: dashboardSvc,
-		doctorRepo:   doctorRepo,
+		baseCtx:       baseCtx,
+		dashboardSvc:  dashboardSvc,
+		doctorRepo:    doctorRepo,
+		assistantRepo: assistantRepo,
 	}
 }
 
@@ -44,6 +47,12 @@ func (controller *DashboardController) GetSummary(c echo.Context) error {
 			return response.BadRequest(c, "Doctor profile not found for user")
 		}
 		doctorID = doctor.ID
+	} else if user.Role == consts.RoleAssistant {
+		assistant, err := controller.assistantRepo.GetAssistantByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Assistant profile not found for user")
+		}
+		doctorID = assistant.DoctorID
 	} else if user.Role == consts.RoleAdmin {
 		doctorID = 0
 	} else {

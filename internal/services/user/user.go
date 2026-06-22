@@ -71,7 +71,8 @@ func (service *Service) Get(ctx context.Context, userID int) (types.UserResp, er
 		return types.UserResp{}, fmt.Errorf("failed to get user: %w", err)
 	}
 	doc, _ := service.doctorRepo.GetDoctorByUserID(user.ID)
-	resp := mapToUserResponse(user, doc.ID != 0)
+	isProfileCompleted := doc.ID != 0 || user.Role == consts.RoleAssistant
+	resp := mapToUserResponse(user, isProfileCompleted)
 
 	return resp, nil
 }
@@ -94,7 +95,8 @@ func (service *Service) List(ctx context.Context, req types.UserListReq) (types.
 	userResp := make([]types.UserResp, len(users))
 	for i, user := range users {
 		doc, _ := service.doctorRepo.GetDoctorByUserID(user.ID)
-		userResp[i] = mapToUserResponse(user, doc.ID != 0)
+		isProfileCompleted := doc.ID != 0 || user.Role == consts.RoleAssistant
+		userResp[i] = mapToUserResponse(user, isProfileCompleted)
 	}
 
 	lastPage := (int(total) + req.Limit - 1) / req.Limit
@@ -134,7 +136,7 @@ func (service *Service) Login(ctx context.Context, req types.LoginReq) (types.Lo
 	}
 
 	doc, _ := service.doctorRepo.GetDoctorByUserID(user.ID)
-	isProfileCompleted := doc.ID != 0
+	isProfileCompleted := doc.ID != 0 || user.Role == consts.RoleAssistant
 
 	return types.LoginResp{
 		Token: token,

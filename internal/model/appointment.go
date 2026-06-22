@@ -45,7 +45,7 @@ type AppointmentRepo interface {
 	GetAppointmentByID(id int) (*Appointment, error)
 	UpdateAppointment(appointment *Appointment) error
 	UpdateAppointmentFields(id int, updates map[string]interface{}) error
-	ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]Appointment, int64, error)
+	ListAppointments(doctorID int, chamberIDs []int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]Appointment, int64, error)
 	GetTodayAppointments(doctorID int) ([]Appointment, error)
 }
 
@@ -54,5 +54,5 @@ type AppointmentUseCase interface {
 	UpdateStatus(ctx context.Context, id int, status AppointmentStatus) error
 	CollectFee(ctx context.Context, id int, amount float64) error
 	GetAppointment(ctx context.Context, id int) (types.AppointmentResp, error)
-	ListAppointments(ctx context.Context, doctorID int, dateFrom, dateTo string, status string, search string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error)
+	ListAppointments(ctx context.Context, doctorID int, chamberIDs []int, dateFrom, dateTo string, status string, search string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error)
 }

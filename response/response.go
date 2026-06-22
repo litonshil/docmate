@@ -83,6 +83,7 @@ func sanitizeErrorMessage(message string) string {
 		"database", "rows", "scan", "tx", "transaction", "driver", "query",
 		"column", "table", "relation", "syntax", "violation", "duplicate key",
 		"constraint", "schema", "db client", "record not found",
+		"sqlstate", "invalid input value", "enum",
 	}
 	for _, kw := range dbKeywords {
 		if strings.Contains(lowerMsg, kw) {

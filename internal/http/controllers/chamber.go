@@ -12,20 +12,23 @@ import (
 )
 
 type ChamberController struct {
-	baseCtx    context.Context
-	chamberSvc model.ChamberUseCase
-	doctorRepo model.DoctorRepo
+	baseCtx       context.Context
+	chamberSvc    model.ChamberUseCase
+	doctorRepo    model.DoctorRepo
+	assistantRepo model.AssistantRepo
 }
 
 func NewChamberController(
 	baseCtx context.Context,
 	chamberSvc model.ChamberUseCase,
 	doctorRepo model.DoctorRepo,
+	assistantRepo model.AssistantRepo,
 ) *ChamberController {
 	return &ChamberController{
-		baseCtx:    baseCtx,
-		chamberSvc: chamberSvc,
-		doctorRepo: doctorRepo,
+		baseCtx:       baseCtx,
+		chamberSvc:    chamberSvc,
+		doctorRepo:    doctorRepo,
+		assistantRepo: assistantRepo,
 	}
 }
 
@@ -166,6 +169,38 @@ func (controller *ChamberController) List(c echo.Context) error {
 			return response.BadRequest(c, "Doctor profile not found for user")
 		}
 		req.DoctorID = doctor.ID
+	} else if user.Role == consts.RoleAssistant {
+		assistant, err := controller.assistantRepo.GetAssistantByUserID(user.ID)
+		if err != nil {
+			return response.BadRequest(c, "Assistant profile not found for user")
+		}
+		chambers, err := controller.assistantRepo.GetChambersByAssistantID(assistant.ID)
+		if err != nil {
+			return response.InternalServerError(c, "Failed to get assigned chambers")
+		}
+		records := make([]types.ChamberResp, 0)
+		for _, ch := range chambers {
+			records = append(records, types.ChamberResp{
+				ID:        ch.ID,
+				DoctorID:  ch.DoctorID,
+				Name:      ch.Name,
+				Address:   ch.Address,
+				Phone:     ch.Phone,
+				IsActive:  ch.IsActive,
+				CreatedAt: ch.CreatedAt,
+				UpdatedAt: ch.UpdatedAt,
+			})
+		}
+
+		return response.Success(c, "chambers fetched successfully", types.PaginatedChamberResp{
+			Pagination: types.Pagination{
+				Total:    int64(len(records)),
+				Page:     1,
+				Limit:    1000,
+				LastPage: 1,
+			},
+			Records: records,
+		})
 	} else if user.Role == consts.RoleAdmin {
 		// For admins, doctor ID is optional. If specified, validate existence.
 		if req.DoctorID > 0 {

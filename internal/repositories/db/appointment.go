@@ -24,13 +24,17 @@ func (r *Repository) UpdateAppointmentFields(id int, updates map[string]interfac
 	return r.client.Model(&model.Appointment{}).Where("id = ?", id).Updates(updates).Error
 }
 
-func (r *Repository) ListAppointments(doctorID int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]model.Appointment, int64, error) {
+func (r *Repository) ListAppointments(doctorID int, chamberIDs []int, dateFrom, dateTo *time.Time, status string, search string, page, limit int) ([]model.Appointment, int64, error) {
 	var appointments []model.Appointment
 	var total int64
 
 	query := r.client.Model(&model.Appointment{})
 	if doctorID != 0 {
 		query = query.Where("doctor_id = ?", doctorID)
+	}
+
+	if len(chamberIDs) > 0 {
+		query = query.Where("chamber_id IN ?", chamberIDs)
 	}
 
 	if search != "" {

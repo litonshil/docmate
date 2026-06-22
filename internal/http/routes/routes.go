@@ -22,6 +22,7 @@ type Routes struct {
 	dashboardController           *controllers.DashboardController
 	aiSettingController           *controllers.AISuggestionController
 	appointmentController         *controllers.AppointmentController
+	assistantController           *controllers.AssistantController
 }
 
 func New(
@@ -36,6 +37,7 @@ func New(
 	dashboardController *controllers.DashboardController,
 	aiSettingController *controllers.AISuggestionController,
 	appointmentController *controllers.AppointmentController,
+	assistantController *controllers.AssistantController,
 ) *Routes {
 	return &Routes{
 		echo:                          e,
@@ -50,6 +52,7 @@ func New(
 		dashboardController:           dashboardController,
 		aiSettingController:           aiSettingController,
 		appointmentController:         appointmentController,
+		assistantController:           assistantController,
 	}
 }
 
@@ -77,7 +80,7 @@ func (r *Routes) Init() {
 		doctors.PATCH("/:id/ai-settings", r.aiSettingController.AdminUpdateSettings, middlewares.AuthRoles(consts.RoleAdmin))
 	}
 
-	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	patients := v1.Group("/patients", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor, consts.RoleAssistant))
 	{
 		patients.GET("", r.patientController.List)
 		patients.POST("", r.patientController.Create)
@@ -94,7 +97,7 @@ func (r *Routes) Init() {
 		chambers.DELETE("/:id", r.chamberController.Delete)
 	}
 
-	globalChambers := v1.Group("/chambers", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	globalChambers := v1.Group("/chambers", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor, consts.RoleAssistant))
 	{
 		globalChambers.GET("", r.chamberController.List)
 	}
@@ -122,12 +125,12 @@ func (r *Routes) Init() {
 		prescriptionSettings.POST("", r.prescriptionSettingController.Upsert)
 	}
 
-	dashboard := v1.Group("/dashboard", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	dashboard := v1.Group("/dashboard", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor, consts.RoleAssistant))
 	{
 		dashboard.GET("/summary", r.dashboardController.GetSummary)
 	}
 
-	appointments := v1.Group("/appointments", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))
+	appointments := v1.Group("/appointments", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor, consts.RoleAssistant))
 	{
 		appointments.GET("", r.appointmentController.List)
 		appointments.POST("", r.appointmentController.Book)
@@ -139,6 +142,14 @@ func (r *Routes) Init() {
 	aiSuggestions := v1.Group("/suggestions", middlewares.AuthRoles(consts.RoleDoctor))
 	{
 		aiSuggestions.POST("", r.aiSettingController.GetSuggestions)
+	}
+
+	assistants := v1.Group("/assistants", middlewares.AuthRoles(consts.RoleDoctor))
+	{
+		assistants.POST("", r.assistantController.Create)
+		assistants.GET("", r.assistantController.List)
+		assistants.GET("/:id", r.assistantController.Get)
+		assistants.PUT("/:id", r.assistantController.Update)
 	}
 
 	aiSettings := v1.Group("/settings/ai", middlewares.AuthRoles(consts.RoleAdmin, consts.RoleDoctor))

@@ -4,6 +4,7 @@ const Limit = 10
 const Page = 1
 
 const (
-	RoleAdmin  = "admin"
-	RoleDoctor = "doctor"
+	RoleAdmin     = "admin"
+	RoleDoctor    = "doctor"
+	RoleAssistant = "assistant"
 )

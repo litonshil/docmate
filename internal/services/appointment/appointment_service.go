@@ -142,7 +142,7 @@ func (s *appointmentService) GetAppointment(ctx context.Context, id int) (types.
 	return mapToAppointmentResponse(*app), nil
 }
 
-func (s *appointmentService) ListAppointments(ctx context.Context, doctorID int, dateFromStr, dateToStr string, status string, search string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error) {
+func (s *appointmentService) ListAppointments(ctx context.Context, doctorID int, chamberIDs []int, dateFromStr, dateToStr string, status string, search string, page, limit int) (types.PaginatedResponse[types.AppointmentResp], error) {
 	var dateFrom, dateTo *time.Time
 
 	if page <= 0 {
@@ -166,7 +166,7 @@ func (s *appointmentService) ListAppointments(ctx context.Context, doctorID int,
 		}
 	}
 
-	appointments, total, err := s.repo.ListAppointments(doctorID, dateFrom, dateTo, status, search, page, limit)
+	appointments, total, err := s.repo.ListAppointments(doctorID, chamberIDs, dateFrom, dateTo, status, search, page, limit)
 	if err != nil {
 		slog.Error("failed to list appointments", "doctor_id", doctorID, "error", err.Error())
 
